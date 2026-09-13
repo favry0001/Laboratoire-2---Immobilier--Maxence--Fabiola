@@ -1,5 +1,6 @@
 package immobilier;
 
+import immobilier.util.LecteurCSV;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,6 +12,11 @@ public class MainFx extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+
+        System.out.println(
+                "Nombre de propriétés chargées : "
+                        + new LecteurCSV().charger().size()
+        );
 
         FXMLLoader loader = new FXMLLoader(
                 MainFx.class.getResource("/fxml/vue-principale.fxml")
@@ -24,6 +30,6 @@ public class MainFx extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }
