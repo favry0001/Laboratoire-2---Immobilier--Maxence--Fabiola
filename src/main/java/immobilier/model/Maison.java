@@ -30,6 +30,18 @@ public class Maison extends Propriete {
         return attributs;
     }
 
+    public int getTerrainPi2() {
+        return terrainPi2;
+    }
+
+    public int getEtages() {
+        return etages;
+    }
+
+    public boolean isGarage() {
+        return garage;
+    }
+
     @Override
     public String typeBien() {
         return "Maison";
