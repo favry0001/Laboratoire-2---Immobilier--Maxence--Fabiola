@@ -1,12 +1,7 @@
 package immobilier.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 public class ControleurPrincipal {
 
@@ -15,6 +10,27 @@ public class ControleurPrincipal {
 
     @FXML
     private ComboBox<String> comboTri;
+
+    @FXML
+    private ComboBox<String> comboTransaction;
+
+    @FXML
+    private ComboBox<String> comboType;
+
+    @FXML
+    private TextField champPrixMax;
+
+    @FXML
+    private ComboBox<String> comboChambres;
+
+    @FXML
+    private TextField champSuperficieMin;
+
+    @FXML
+    private ComboBox<String> comboVille;
+
+    @FXML
+    private TextField champAnneeMin;
 
     @FXML
     private TableView<Object> tableProprietes;
@@ -70,6 +86,32 @@ public class ControleurPrincipal {
                 "Prix au pied carré"
         );
 
-        comboTri.setPromptText("Trier par");
+        comboTransaction.getItems().addAll(
+                "Toutes",
+                "Vente",
+                "Location"
+        );
+
+        comboType.getItems().addAll(
+                "Toutes",
+                "Maison",
+                "Condo"
+        );
+
+        comboChambres.getItems().addAll(
+                "1+",
+                "2+",
+                "3+",
+                "4+",
+                "5+"
+        );
+
+        comboVille.getItems().addAll(
+                "Toutes",
+                "Montréal",
+                "Laval",
+                "Québec",
+                "Sherbrooke"
+        );
     }
 }

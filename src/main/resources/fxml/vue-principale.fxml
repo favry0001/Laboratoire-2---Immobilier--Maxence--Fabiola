@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="immobilier.controller.ControleurPrincipal"
@@ -24,10 +17,43 @@
 
                 <TextField fx:id="champRecherche"
                            promptText="Rechercher une rue ou une ville..."
-                           prefWidth="450"/>
+                           prefWidth="400"/>
 
                 <ComboBox fx:id="comboTri"
-                          prefWidth="220"/>
+                          promptText="Trier par"
+                          prefWidth="200"/>
+
+            </HBox>
+
+            <HBox spacing="10">
+
+                <ComboBox fx:id="comboTransaction"
+                          promptText="Transaction"
+                          prefWidth="150"/>
+
+                <ComboBox fx:id="comboType"
+                          promptText="Type de bien"
+                          prefWidth="150"/>
+
+                <TextField fx:id="champPrixMax"
+                           promptText="Prix max"
+                           prefWidth="120"/>
+
+                <ComboBox fx:id="comboChambres"
+                          promptText="Chambres min"
+                          prefWidth="140"/>
+
+                <TextField fx:id="champSuperficieMin"
+                           promptText="Superficie min"
+                           prefWidth="140"/>
+
+                <ComboBox fx:id="comboVille"
+                          promptText="Ville"
+                          prefWidth="140"/>
+
+                <TextField fx:id="champAnneeMin"
+                           promptText="Année min"
+                           prefWidth="110"/>
 
             </HBox>
 
@@ -44,11 +70,9 @@
                        styleClass="sous-titre"/>
 
                 <TableView fx:id="tableProprietes"
-                           prefHeight="520"
-                           prefWidth="780">
+                           prefHeight="500">
 
                     <columns>
-
                         <TableColumn fx:id="colPrix"
                                      text="Prix"
                                      prefWidth="150"/>
@@ -68,7 +92,6 @@
                         <TableColumn fx:id="colSuperficie"
                                      text="Superficie"
                                      prefWidth="160"/>
-
                     </columns>
 
                 </TableView>
