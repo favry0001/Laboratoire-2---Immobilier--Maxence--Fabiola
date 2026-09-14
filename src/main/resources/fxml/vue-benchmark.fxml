@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="immobilier.controller.ControleurBenchmark"
+      spacing="15"
+      prefWidth="700"
+      prefHeight="450"
+      style="-fx-padding: 20;">
+
+    <Label text="Comparaison des algorithmes de tri"
+           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <Label text="Benchmark sur les propriétés chargées depuis le CSV."/>
+
+    <TableView fx:id="tableBenchmark"
+               prefHeight="280">
+
+        <columns>
+
+            <TableColumn fx:id="colAlgorithme"
+                         text="Algorithme"
+                         prefWidth="220"/>
+
+            <TableColumn fx:id="colTemps"
+                         text="Temps"
+                         prefWidth="220"/>
+
+            <TableColumn fx:id="colElements"
+                         text="Éléments"
+                         prefWidth="180"/>
+
+        </columns>
+
+    </TableView>
+
+    <HBox spacing="10">
+
+        <Button fx:id="btnLancer"
+                text="Lancer le benchmark"/>
+
+        <Button fx:id="btnFermer"
+                text="Fermer"/>
+
+    </HBox>
+
+</VBox>

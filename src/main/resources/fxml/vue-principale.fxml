@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="immobilier.controller.ControleurPrincipal"
+            prefWidth="1280"
+            prefHeight="800">
+
+    <top>
+        <VBox>
+
+            <HBox alignment="CENTER_LEFT"
+                  spacing="20"
+                  styleClass="top-bar">
+
+                <VBox spacing="3"
+                      HBox.hgrow="ALWAYS">
+
+                    <Label text="Catalogue Immobilier"
+                           styleClass="main-title"/>
+
+                    <Label text="Parcourez les propriétés et trouvez celle qui vous convient"
+                           styleClass="main-subtitle"/>
+
+                </VBox>
+
+                <Button fx:id="btnBenchmark"
+                        text="Benchmark"
+                        onAction="#ouvrirBenchmark"
+                        styleClass="benchmark-button"/>
+
+            </HBox>
+
+            <VBox spacing="12"
+                  styleClass="filter-panel">
+
+                <HBox spacing="12"
+                      alignment="CENTER_LEFT">
+
+                    <TextField fx:id="champRecherche"
+                               promptText="Rechercher une ville ou un quartier"
+                               prefWidth="360"/>
+
+                    <ComboBox fx:id="comboTransaction"
+                              prefWidth="150"/>
+
+                    <ComboBox fx:id="comboType"
+                              prefWidth="150"/>
+
+                    <ComboBox fx:id="comboVille"
+                              prefWidth="160"/>
+
+                </HBox>
+
+                <HBox spacing="12"
+                      alignment="CENTER_LEFT">
+
+                    <TextField fx:id="champPrixMax"
+                               promptText="Prix maximum"
+                               prefWidth="160"/>
+
+                    <ComboBox fx:id="comboChambres"
+                              prefWidth="150"/>
+
+                    <ComboBox fx:id="comboTri"
+                              promptText="Trier par"
+                              prefWidth="210"/>
+
+                </HBox>
+
+            </VBox>
+
+        </VBox>
+    </top>
+
+    <center>
+
+        <HBox spacing="20"
+              style="-fx-padding: 20;">
+
+            <VBox spacing="12"
+                  styleClass="main-card"
+                  HBox.hgrow="ALWAYS">
+
+                <HBox alignment="CENTER_LEFT">
+
+                    <VBox spacing="2"
+                          HBox.hgrow="ALWAYS">
+
+                        <Label text="Propriétés disponibles"
+                               styleClass="section-title"/>
+
+                        <Label text="Sélectionnez une ligne pour afficher les détails"
+                               styleClass="section-subtitle"/>
+
+                    </VBox>
+
+                    <Label fx:id="labelPage"
+                           text="Page 1 / 1"
+                           styleClass="page-badge"/>
+
+                </HBox>
+
+                <TableView fx:id="tableProprietes"
+                           VBox.vgrow="ALWAYS">
+
+                    <columns>
+
+                        <TableColumn fx:id="colPrix"
+                                     text="Prix"
+                                     prefWidth="150"/>
+
+                        <TableColumn fx:id="colType"
+                                     text="Type"
+                                     prefWidth="130"/>
+
+                        <TableColumn fx:id="colVille"
+                                     text="Ville"
+                                     prefWidth="170"/>
+
+                        <TableColumn fx:id="colChambres"
+                                     text="Chambres"
+                                     prefWidth="130"/>
+
+                        <TableColumn fx:id="colSuperficie"
+                                     text="Superficie"
+                                     prefWidth="160"/>
+
+                    </columns>
+
+                </TableView>
+
+                <HBox spacing="10"
+                      alignment="CENTER_RIGHT">
+
+                    <Button fx:id="btnPrecedent"
+                            text="Précédent"
+                            styleClass="secondary-button"/>
+
+                    <Button fx:id="btnSuivant"
+                            text="Suivant"
+                            styleClass="primary-button"/>
+
+                </HBox>
+
+            </VBox>
+
+            <VBox spacing="14"
+                  prefWidth="330"
+                  styleClass="details-card">
+
+                <Label text="Détails"
+                       styleClass="section-title"/>
+
+                <Separator/>
+
+                <VBox spacing="4">
+
+                    <Label text="Prix"
+                           styleClass="detail-label"/>
+
+                    <Label fx:id="labelPrix"
+                           text="Prix :"
+                           styleClass="detail-value"/>
+
+                </VBox>
+
+                <VBox spacing="4">
+
+                    <Label text="Transaction"
+                           styleClass="detail-label"/>
+
+                    <Label fx:id="labelTransaction"
+                           text="Transaction :"
+                           styleClass="detail-value"/>
+
+                </VBox>
+
+                <VBox spacing="4">
+
+                    <Label text="Adresse"
+                           styleClass="detail-label"/>
+
+                    <Label fx:id="labelAdresse"
+                           text="Adresse :"
+                           wrapText="true"
+                           styleClass="detail-value"/>
+
+                </VBox>
+
+                <Separator/>
+
+                <Label text="Informations"
+                       styleClass="detail-label"/>
+
+                <ScrollPane fitToWidth="true"
+                            VBox.vgrow="ALWAYS"
+                            styleClass="info-scroll">
+
+                    <content>
+
+                        <Label fx:id="labelInfos"
+                               wrapText="true"
+                               prefWidth="280"
+                               styleClass="info-text"/>
+
+                    </content>
+
+                </ScrollPane>
+
+                <Button fx:id="btnFavoris"
+                        text="Ajouter aux favoris"
+                        maxWidth="Infinity"
+                        styleClass="favorite-button"/>
+
+            </VBox>
+
+        </HBox>
+
+    </center>
+
+</BorderPane>

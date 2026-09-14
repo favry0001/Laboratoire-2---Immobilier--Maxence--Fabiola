@@ -19,6 +19,47 @@ public abstract class Propriete {
     private final LocalDate datePubli;
     private final String description;
 
+    public Propriete(
+            String id,
+            TypeTransaction typeTransaction,
+            double prix,
+            int superficie,
+            int chambres,
+            double sallesBain,
+            String ville,
+            String quartier,
+            int anneeConstruction,
+            TypeCourtier typeCourtier,
+            LocalDate datePubli,
+            String description
+    ) {
+        this.id = Objects.requireNonNull(id);
+        this.typeTransaction = Objects.requireNonNull(typeTransaction);
+
+        if (prix <= 0) {
+            throw new IllegalArgumentException("prix doit etre positif");
+        }
+
+        this.prix = prix;
+        this.superficie = superficie;
+        this.chambres = chambres;
+        this.sallesBain = sallesBain;
+        this.ville = ville;
+        this.quartier = quartier;
+        this.anneeConstruction = anneeConstruction;
+        this.typeCourtier = typeCourtier;
+        this.datePubli = datePubli;
+        this.description = description;
+    }
+
+    public double prixAuPiedCarre() {
+        return superficie == 0 ? 0 : prix / superficie;
+    }
+
+    public abstract Map<String, String> attributsSpecifiques();
+
+    public abstract String typeBien();
+
     public String getId() {
         return id;
     }
@@ -66,31 +107,4 @@ public abstract class Propriete {
     public String getDescription() {
         return description;
     }
-
-    public Propriete(String id, TypeTransaction typeTransaction, double prix, int superficie,
-                     int chambres, double sallesBain, String ville, String quartier,
-                     int anneeConstruction, TypeCourtier typeCourtier, LocalDate datePubli,
-                     String description) {
-        this.id = Objects.requireNonNull(id);
-        this.typeTransaction = Objects.requireNonNull(typeTransaction);
-        if (prix <= 0) throw new IllegalArgumentException("prix doit etre positif");
-        this.prix = prix;
-        this.superficie = superficie;
-        this.chambres = chambres;
-        this.sallesBain = sallesBain;
-        this.ville = ville;
-        this.quartier = quartier;
-        this.anneeConstruction = anneeConstruction;
-        this.typeCourtier = typeCourtier;
-        this.datePubli = datePubli;
-        this.description = description;
-    }
-
-    public double prixAuPiedCarre() {
-        return superficie == 0 ? 0 : prix / superficie;
-    }
-
-    public abstract Map<String, String> attributsSpecifiques();
-
-    public abstract String typeBien();
 }
