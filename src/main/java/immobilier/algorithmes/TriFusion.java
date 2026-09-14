@@ -23,12 +23,12 @@ public class TriFusion<T> implements Algorithme<T> {
 
     private void trier(List<T> liste, int debut, int fin, Comparator<T> comparateur) {
         if (debut >= fin) {
-            return;                                    // cas de base : 0 ou 1 element
+            return;                                   
         }
         int milieu = (debut + fin) / 2;
-        trier(liste, debut, milieu, comparateur);      // DIVISE + REGNE (gauche)
-        trier(liste, milieu + 1, fin, comparateur);    // DIVISE + REGNE (droite)
-        fusionner(liste, debut, milieu, fin, comparateur);   // COMBINE
+        trier(liste, debut, milieu, comparateur);
+        trier(liste, milieu + 1, fin, comparateur);
+        fusionner(liste, debut, milieu, fin, comparateur);
     }
 
     private void fusionner(List<T> liste, int debut, int milieu, int fin,
@@ -40,7 +40,7 @@ public class TriFusion<T> implements Algorithme<T> {
 
         while (i < gauche.size() && j < droite.size()) {
             if (comparateur.compare(gauche.get(i), droite.get(j)) <= 0) {
-                liste.set(k++, gauche.get(i++));       // <= preserve la stabilite
+                liste.set(k++, gauche.get(i++));
             } else {
                 liste.set(k++, droite.get(j++));
             }
