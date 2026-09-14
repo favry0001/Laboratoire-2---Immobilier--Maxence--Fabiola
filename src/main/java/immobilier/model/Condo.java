@@ -21,6 +21,18 @@ public class Condo extends Propriete {
         this.ascenseur = ascenseur;
     }
 
+    public int getEtageUnite() {
+        return etageUnite;
+    }
+
+    public double getFraisCondo() {
+        return fraisCondo;
+    }
+
+    public boolean isAscenseur() {
+        return ascenseur;
+    }
+
     @Override
     public Map<String, String> attributsSpecifiques() {
         Map<String, String> attributs = new LinkedHashMap<>();
