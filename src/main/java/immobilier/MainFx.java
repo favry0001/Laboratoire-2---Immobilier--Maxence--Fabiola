@@ -22,9 +22,22 @@ public class MainFx extends Application {
                 MainFx.class.getResource("/fxml/vue-principale.fxml")
         );
 
-        Scene scene = new Scene(loader.load(), 1200, 750);
+        Scene scene = new Scene(
+                loader.load(),
+                1200,
+                750
+        );
 
-        stage.setTitle("Catalogue Immobilier");
+        scene.getStylesheets().add(
+                MainFx.class
+                        .getResource("/css/style.css")
+                        .toExternalForm()
+        );
+
+        stage.setTitle(
+                "Catalogue Immobilier"
+        );
+
         stage.setScene(scene);
         stage.show();
     }

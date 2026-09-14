@@ -2,6 +2,7 @@ package immobilier.controller;
 
 import immobilier.algorithmes.Comparateurs;
 import immobilier.algorithmes.TriFusion;
+import immobilier.model.Favoris;
 import immobilier.model.Propriete;
 import immobilier.model.TypeTransaction;
 import immobilier.service.CritereFiltre;
@@ -92,6 +93,9 @@ public class ControleurPrincipal {
     private final ServiceCatalogue service =
             new ServiceCatalogueImpl(new LecteurCSV());
 
+    private final Favoris favoris =
+            new Favoris();
+
     @FXML
     public void initialize() {
 
@@ -100,6 +104,7 @@ public class ControleurPrincipal {
         preparerRechercheEtFiltres();
         preparerPagination();
         preparerSelection();
+        preparerFavoris();
 
         afficherPage();
     }
@@ -157,7 +162,10 @@ public class ControleurPrincipal {
 
         colPrix.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        String.format("%.0f $", data.getValue().getPrix())
+                        String.format(
+                                "%.0f $",
+                                data.getValue().getPrix()
+                        )
                 )
         );
 
@@ -175,13 +183,16 @@ public class ControleurPrincipal {
 
         colChambres.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        String.valueOf(data.getValue().getChambres())
+                        String.valueOf(
+                                data.getValue().getChambres()
+                        )
                 )
         );
 
         colSuperficie.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        data.getValue().getSuperficie() + " pi²"
+                        data.getValue().getSuperficie()
+                                + " pi²"
                 )
         );
     }
@@ -190,13 +201,15 @@ public class ControleurPrincipal {
 
         champRecherche.textProperty().addListener(
                 (observable, ancien, nouveau) -> {
+
                     service.rechercher(nouveau);
                     afficherPage();
                 }
         );
 
         champPrixMax.textProperty().addListener(
-                (observable, ancien, nouveau) -> appliquerFiltres()
+                (observable, ancien, nouveau) ->
+                        appliquerFiltres()
         );
 
         comboTransaction.setOnAction(
@@ -222,38 +235,54 @@ public class ControleurPrincipal {
 
     private void appliquerFiltres() {
 
-        CritereFiltre criteres = new CritereFiltre();
+        CritereFiltre criteres =
+                new CritereFiltre();
 
-        String transaction = comboTransaction.getValue();
+        String transaction =
+                comboTransaction.getValue();
 
         if ("Vente".equals(transaction)) {
-            criteres.setTransaction(TypeTransaction.VENTE);
+            criteres.setTransaction(
+                    TypeTransaction.VENTE
+            );
         }
 
         if ("Location".equals(transaction)) {
-            criteres.setTransaction(TypeTransaction.LOCATION);
+            criteres.setTransaction(
+                    TypeTransaction.LOCATION
+            );
         }
 
-        String type = comboType.getValue();
+        String type =
+                comboType.getValue();
 
-        if (type != null && !"Toutes".equals(type)) {
+        if (type != null
+                && !"Toutes".equals(type)) {
+
             criteres.setTypeBien(type);
         }
 
-        String prix = champPrixMax.getText().trim();
+        String prix =
+                champPrixMax.getText().trim();
 
         if (!prix.isEmpty()) {
+
             try {
+
                 criteres.setPrixMax(
                         Double.parseDouble(prix)
                 );
+
             } catch (NumberFormatException ignored) {
             }
         }
 
-        String chambres = comboChambres.getValue();
+        String chambres =
+                comboChambres.getValue();
 
-        if (chambres != null && !"Toutes".equals(chambres)) {
+        if (chambres != null
+                && !"Toutes".equals(chambres)) {
+
             criteres.setChambresMin(
                     Integer.parseInt(
                             chambres.replace("+", "")
@@ -261,9 +290,12 @@ public class ControleurPrincipal {
             );
         }
 
-        String ville = comboVille.getValue();
+        String ville =
+                comboVille.getValue();
 
-        if (ville != null && !"Toutes".equals(ville)) {
+        if (ville != null
+                && !"Toutes".equals(ville)) {
+
             criteres.setVille(ville);
         }
 
@@ -274,7 +306,8 @@ public class ControleurPrincipal {
 
     private void appliquerTri() {
 
-        String choix = comboTri.getValue();
+        String choix =
+                comboTri.getValue();
 
         if (choix == null) {
             return;
@@ -285,26 +318,32 @@ public class ControleurPrincipal {
         switch (choix) {
 
             case "Prix croissant" ->
-                    comparateur = Comparateurs.parPrixCroissant();
+                    comparateur =
+                            Comparateurs.parPrixCroissant();
 
             case "Prix décroissant" ->
-                    comparateur = Comparateurs.parPrixDecroissant();
+                    comparateur =
+                            Comparateurs.parPrixDecroissant();
 
             case "Superficie décroissante" ->
-                    comparateur = Comparateurs.parSuperficieDecroissante();
+                    comparateur =
+                            Comparateurs.parSuperficieDecroissante();
 
             case "Année de construction" ->
-                    comparateur = Comparator.comparingInt(
-                            Propriete::getAnneeConstruction
-                    );
+                    comparateur =
+                            Comparator.comparingInt(
+                                    Propriete::getAnneeConstruction
+                            );
 
             case "Date de publication" ->
-                    comparateur = Comparator.comparing(
-                            Propriete::getDatePubli
-                    );
+                    comparateur =
+                            Comparator.comparing(
+                                    Propriete::getDatePubli
+                            );
 
             case "Prix au pied carré" ->
-                    comparateur = Comparateurs.parPrixAuPiedCarre();
+                    comparateur =
+                            Comparateurs.parPrixAuPiedCarre();
 
             default -> {
                 return;
@@ -324,14 +363,12 @@ public class ControleurPrincipal {
         btnPrecedent.setOnAction(event -> {
 
             service.pagePrecedente();
-
             afficherPage();
         });
 
         btnSuivant.setOnAction(event -> {
 
             service.pageSuivante();
-
             afficherPage();
         });
     }
@@ -370,13 +407,67 @@ public class ControleurPrincipal {
                         (observable, ancien, nouveau) -> {
 
                             if (nouveau != null) {
+
                                 afficherDetails(nouveau);
+                                mettreAJourBoutonFavoris(nouveau);
+
+                            } else {
+
+                                btnFavoris.setDisable(true);
                             }
                         }
                 );
     }
 
-    private void afficherDetails(Propriete propriete) {
+    private void preparerFavoris() {
+
+        btnFavoris.setDisable(true);
+
+        btnFavoris.setOnAction(event -> {
+
+            Propriete propriete =
+                    tableProprietes
+                            .getSelectionModel()
+                            .getSelectedItem();
+
+            if (propriete == null) {
+                return;
+            }
+
+            favoris.basculer(propriete);
+
+            mettreAJourBoutonFavoris(propriete);
+
+            System.out.println(
+                    "Nombre de favoris : "
+                            + favoris.taille()
+            );
+        });
+    }
+
+    private void mettreAJourBoutonFavoris(
+            Propriete propriete
+    ) {
+
+        btnFavoris.setDisable(false);
+
+        if (favoris.contient(propriete)) {
+
+            btnFavoris.setText(
+                    "Retirer des favoris"
+            );
+
+        } else {
+
+            btnFavoris.setText(
+                    "Ajouter aux favoris"
+            );
+        }
+    }
+
+    private void afficherDetails(
+            Propriete propriete
+    ) {
 
         labelPrix.setText(
                 "Prix : "
@@ -398,30 +489,43 @@ public class ControleurPrincipal {
                         + propriete.getVille()
         );
 
-        StringBuilder infos = new StringBuilder();
+        StringBuilder infos =
+                new StringBuilder();
 
         infos.append("Type : ")
-                .append(propriete.typeBien())
+                .append(
+                        propriete.typeBien()
+                )
                 .append("\n");
 
         infos.append("Chambres : ")
-                .append(propriete.getChambres())
+                .append(
+                        propriete.getChambres()
+                )
                 .append("\n");
 
         infos.append("Salles de bain : ")
-                .append(propriete.getSallesBain())
+                .append(
+                        propriete.getSallesBain()
+                )
                 .append("\n");
 
         infos.append("Superficie : ")
-                .append(propriete.getSuperficie())
+                .append(
+                        propriete.getSuperficie()
+                )
                 .append(" pi²\n");
 
         infos.append("Année : ")
-                .append(propriete.getAnneeConstruction())
+                .append(
+                        propriete.getAnneeConstruction()
+                )
                 .append("\n");
 
         infos.append("Courtier : ")
-                .append(propriete.getTypeCourtier())
+                .append(
+                        propriete.getTypeCourtier()
+                )
                 .append("\n");
 
         infos.append("Prix au pi² : ")
@@ -434,7 +538,9 @@ public class ControleurPrincipal {
                 .append("\n\n");
 
         for (Map.Entry<String, String> entree
-                : propriete.attributsSpecifiques().entrySet()) {
+                : propriete
+                .attributsSpecifiques()
+                .entrySet()) {
 
             infos.append(entree.getKey())
                     .append(" : ")
@@ -443,7 +549,9 @@ public class ControleurPrincipal {
         }
 
         infos.append("\n")
-                .append(propriete.getDescription());
+                .append(
+                        propriete.getDescription()
+                );
 
         labelInfos.setText(
                 infos.toString()
@@ -455,19 +563,38 @@ public class ControleurPrincipal {
 
         try {
 
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/vue-benchmark.fxml")
+            FXMLLoader loader =
+                    new FXMLLoader(
+                            getClass().getResource(
+                                    "/fxml/vue-benchmark.fxml"
+                            )
+                    );
+
+            Scene scene =
+                    new Scene(
+                            loader.load()
+                    );
+
+            scene.getStylesheets().add(
+                    getClass()
+                            .getResource(
+                                    "/css/style.css"
+                            )
+                            .toExternalForm()
             );
 
-            Scene scene = new Scene(loader.load());
+            Stage stage =
+                    new Stage();
 
-            Stage stage = new Stage();
+            stage.setTitle(
+                    "Benchmark des algorithmes"
+            );
 
-            stage.setTitle("Benchmark des algorithmes");
             stage.setScene(scene);
             stage.show();
 
         } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
