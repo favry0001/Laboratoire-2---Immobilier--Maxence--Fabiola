@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="immobilier.controller.ControleurPrincipal"
+            prefWidth="1200"
+            prefHeight="750">
+
+    <top>
+
+        <VBox spacing="10"
+              style="-fx-padding: 20;">
+
+            <Label text="Catalogue Immobilier"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold;" />
+
+            <HBox spacing="10">
+
+                <TextField fx:id="champRecherche"
+                           promptText="Rechercher par ville ou quartier"
+                           prefWidth="420" />
+
+                <ComboBox fx:id="comboTri"
+                          promptText="Trier par"
+                          prefWidth="220" />
+
+            </HBox>
+
+            <HBox spacing="10">
+
+                <ComboBox fx:id="comboTransaction"
+                          prefWidth="160" />
+
+                <ComboBox fx:id="comboType"
+                          prefWidth="160" />
+
+                <TextField fx:id="champPrixMax"
+                           promptText="Prix max"
+                           prefWidth="130" />
+
+                <ComboBox fx:id="comboChambres"
+                          prefWidth="150" />
+
+                <ComboBox fx:id="comboVille"
+                          prefWidth="160" />
+
+            </HBox>
+
+        </VBox>
+
+    </top>
+
+    <center>
+
+        <HBox spacing="20"
+              style="-fx-padding: 0 20 20 20;">
+
+            <VBox spacing="10"
+                  HBox.hgrow="ALWAYS">
+
+                <Label text="Liste des propriétés"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+                <TableView fx:id="tableProprietes"
+                           prefWidth="850"
+                           prefHeight="520">
+
+                    <columns>
+
+                        <TableColumn fx:id="colPrix"
+                                     text="Prix"
+                                     prefWidth="170" />
+
+                        <TableColumn fx:id="colType"
+                                     text="Type"
+                                     prefWidth="150" />
+
+                        <TableColumn fx:id="colVille"
+                                     text="Ville"
+                                     prefWidth="180" />
+
+                        <TableColumn fx:id="colChambres"
+                                     text="Chambres"
+                                     prefWidth="160" />
+
+                        <TableColumn fx:id="colSuperficie"
+                                     text="Superficie"
+                                     prefWidth="180" />
+
+                    </columns>
+
+                </TableView>
+
+                <HBox spacing="10">
+
+                    <Button fx:id="btnPrecedent"
+                            text="Précédent" />
+
+                    <Label fx:id="labelPage"
+                           text="Page 1" />
+
+                    <Button fx:id="btnSuivant"
+                            text="Suivant" />
+
+                </HBox>
+
+            </VBox>
+
+            <VBox spacing="15"
+                  prefWidth="320"
+                  style="-fx-padding: 20; -fx-border-color: lightgray; -fx-border-width: 1;">
+
+                <Label text="Détails de la propriété"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+
+                <Label fx:id="labelPrix"
+                       text="Prix :" />
+
+                <Label fx:id="labelTransaction"
+                       text="Transaction :" />
+
+                <Label fx:id="labelAdresse"
+                       text="Adresse :" />
+
+                <Label text="Informations :" />
+
+                <Label fx:id="labelInfos"
+                       wrapText="true"
+                       prefWidth="280" />
+
+                <Button fx:id="btnFavoris"
+                        text="Ajouter aux favoris" />
+
+            </VBox>
+
+        </HBox>
+
+    </center>
+
+</BorderPane>

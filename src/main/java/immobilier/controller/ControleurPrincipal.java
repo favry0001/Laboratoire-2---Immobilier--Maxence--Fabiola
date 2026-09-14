@@ -1,7 +1,12 @@
 package immobilier.controller;
 
+import immobilier.algorithmes.Comparateurs;
+import immobilier.algorithmes.TriFusion;
 import immobilier.model.Propriete;
 import immobilier.model.TypeTransaction;
+import immobilier.service.CritereFiltre;
+import immobilier.service.ServiceCatalogue;
+import immobilier.service.ServiceCatalogueImpl;
 import immobilier.util.LecteurCSV;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -9,8 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Map;
 
 public class ControleurPrincipal {
@@ -34,13 +38,7 @@ public class ControleurPrincipal {
     private ComboBox<String> comboChambres;
 
     @FXML
-    private TextField champSuperficieMin;
-
-    @FXML
     private ComboBox<String> comboVille;
-
-    @FXML
-    private TextField champAnneeMin;
 
     @FXML
     private TableView<Propriete> tableProprietes;
@@ -84,29 +82,19 @@ public class ControleurPrincipal {
     @FXML
     private Label labelInfos;
 
-    private final List<Propriete> toutesProprietes = new ArrayList<>();
-    private final List<Propriete> proprietesFiltrees = new ArrayList<>();
-
-    private int pageActuelle = 1;
-
-    private static final int TAILLE_PAGE = 25;
+    private final ServiceCatalogue service =
+            new ServiceCatalogueImpl(new LecteurCSV());
 
     @FXML
     public void initialize() {
 
         preparerMenus();
-
         preparerTableau();
-
-        chargerProprietes();
-
         preparerRechercheEtFiltres();
-
         preparerPagination();
-
         preparerSelection();
 
-        appliquerFiltres();
+        afficherPage();
     }
 
     private void preparerMenus() {
@@ -142,6 +130,15 @@ public class ControleurPrincipal {
         );
 
         comboVille.getItems().add("Toutes");
+
+        for (Propriete propriete : service.toutesLesDonnees()) {
+
+            String ville = propriete.getVille();
+
+            if (!comboVille.getItems().contains(ville)) {
+                comboVille.getItems().add(ville);
+            }
+        }
 
         comboTransaction.setValue("Toutes");
         comboType.setValue("Toutes");
@@ -182,305 +179,185 @@ public class ControleurPrincipal {
         );
     }
 
-    private void chargerProprietes() {
-
-        LecteurCSV lecteurCSV = new LecteurCSV();
-
-        toutesProprietes.addAll(
-                lecteurCSV.charger()
-        );
-
-        for (Propriete propriete : toutesProprietes) {
-
-            String ville = propriete.getVille();
-
-            if (!comboVille.getItems().contains(ville)) {
-                comboVille.getItems().add(ville);
-            }
-        }
-
-        System.out.println(
-                toutesProprietes.size() + " propriétés chargées."
-        );
-    }
-
     private void preparerRechercheEtFiltres() {
 
         champRecherche.textProperty().addListener(
-                (observable, ancien, nouveau) -> appliquerFiltres()
+                (observable, ancien, nouveau) -> {
+                    service.rechercher(nouveau);
+                    afficherPage();
+                }
         );
 
         champPrixMax.textProperty().addListener(
                 (observable, ancien, nouveau) -> appliquerFiltres()
         );
 
-        champSuperficieMin.textProperty().addListener(
-                (observable, ancien, nouveau) -> appliquerFiltres()
+        comboTransaction.setOnAction(
+                event -> appliquerFiltres()
         );
 
-        champAnneeMin.textProperty().addListener(
-                (observable, ancien, nouveau) -> appliquerFiltres()
+        comboType.setOnAction(
+                event -> appliquerFiltres()
         );
 
-        comboTransaction.setOnAction(event -> appliquerFiltres());
+        comboChambres.setOnAction(
+                event -> appliquerFiltres()
+        );
 
-        comboType.setOnAction(event -> appliquerFiltres());
+        comboVille.setOnAction(
+                event -> appliquerFiltres()
+        );
 
-        comboChambres.setOnAction(event -> appliquerFiltres());
-
-        comboVille.setOnAction(event -> appliquerFiltres());
+        comboTri.setOnAction(
+                event -> appliquerTri()
+        );
     }
 
     private void appliquerFiltres() {
 
-        proprietesFiltrees.clear();
+        CritereFiltre criteres = new CritereFiltre();
 
-        String recherche = champRecherche.getText()
-                .trim()
-                .toLowerCase();
+        String transaction = comboTransaction.getValue();
 
-        for (Propriete propriete : toutesProprietes) {
-
-            if (!recherche.isEmpty()) {
-
-                String texte = (
-                        propriete.getVille()
-                                + " "
-                                + propriete.getQuartier()
-                                + " "
-                                + propriete.getDescription()
-                ).toLowerCase();
-
-                if (!texte.contains(recherche)) {
-                    continue;
-                }
-            }
-
-            if (!transactionValide(propriete)) {
-                continue;
-            }
-
-            if (!typeValide(propriete)) {
-                continue;
-            }
-
-            if (!prixValide(propriete)) {
-                continue;
-            }
-
-            if (!chambresValides(propriete)) {
-                continue;
-            }
-
-            if (!superficieValide(propriete)) {
-                continue;
-            }
-
-            if (!villeValide(propriete)) {
-                continue;
-            }
-
-            if (!anneeValide(propriete)) {
-                continue;
-            }
-
-            proprietesFiltrees.add(propriete);
+        if ("Vente".equals(transaction)) {
+            criteres.setTransaction(TypeTransaction.VENTE);
         }
 
-        pageActuelle = 1;
+        if ("Location".equals(transaction)) {
+            criteres.setTransaction(TypeTransaction.LOCATION);
+        }
+
+        String type = comboType.getValue();
+
+        if (type != null && !"Toutes".equals(type)) {
+            criteres.setTypeBien(type);
+        }
+
+        String prix = champPrixMax.getText().trim();
+
+        if (!prix.isEmpty()) {
+            try {
+                criteres.setPrixMax(
+                        Double.parseDouble(prix)
+                );
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        String chambres = comboChambres.getValue();
+
+        if (chambres != null && !"Toutes".equals(chambres)) {
+            criteres.setChambresMin(
+                    Integer.parseInt(
+                            chambres.replace("+", "")
+                    )
+            );
+        }
+
+        String ville = comboVille.getValue();
+
+        if (ville != null && !"Toutes".equals(ville)) {
+            criteres.setVille(ville);
+        }
+
+        service.appliquerFiltres(criteres);
 
         afficherPage();
     }
 
-    private boolean transactionValide(Propriete propriete) {
+    private void appliquerTri() {
 
-        String choix = comboTransaction.getValue();
+        String choix = comboTri.getValue();
 
-        if (choix == null || choix.equals("Toutes")) {
-            return true;
+        if (choix == null) {
+            return;
         }
 
-        if (choix.equals("Vente")) {
-            return propriete.getTypeTransaction() == TypeTransaction.VENTE;
+        Comparator<Propriete> comparateur;
+
+        switch (choix) {
+
+            case "Prix croissant" ->
+                    comparateur = Comparateurs.parPrixCroissant();
+
+            case "Prix décroissant" ->
+                    comparateur = Comparateurs.parPrixDecroissant();
+
+            case "Superficie décroissante" ->
+                    comparateur = Comparateurs.parSuperficieDecroissante();
+
+            case "Année de construction" ->
+                    comparateur = Comparator.comparingInt(
+                            Propriete::getAnneeConstruction
+                    );
+
+            case "Date de publication" ->
+                    comparateur = Comparator.comparing(
+                            Propriete::getDatePubli
+                    );
+
+            case "Prix au pied carré" ->
+                    comparateur = Comparateurs.parPrixAuPiedCarre();
+
+            default -> {
+                return;
+            }
         }
 
-        if (choix.equals("Location")) {
-            return propriete.getTypeTransaction() == TypeTransaction.LOCATION;
-        }
-
-        return true;
-    }
-
-    private boolean typeValide(Propriete propriete) {
-
-        String choix = comboType.getValue();
-
-        if (choix == null || choix.equals("Toutes")) {
-            return true;
-        }
-
-        return propriete.typeBien().equalsIgnoreCase(choix);
-    }
-
-    private boolean prixValide(Propriete propriete) {
-
-        String texte = champPrixMax.getText().trim();
-
-        if (texte.isEmpty()) {
-            return true;
-        }
-
-        try {
-
-            double prixMax = Double.parseDouble(texte);
-
-            return propriete.getPrix() <= prixMax;
-
-        } catch (NumberFormatException e) {
-
-            return true;
-        }
-    }
-
-    private boolean chambresValides(Propriete propriete) {
-
-        String choix = comboChambres.getValue();
-
-        if (choix == null || choix.equals("Toutes")) {
-            return true;
-        }
-
-        int minimum = Integer.parseInt(
-                choix.replace("+", "")
+        service.trier(
+                comparateur,
+                new TriFusion<>()
         );
 
-        return propriete.getChambres() >= minimum;
-    }
-
-    private boolean superficieValide(Propriete propriete) {
-
-        String texte = champSuperficieMin.getText().trim();
-
-        if (texte.isEmpty()) {
-            return true;
-        }
-
-        try {
-
-            int superficieMin = Integer.parseInt(texte);
-
-            return propriete.getSuperficie() >= superficieMin;
-
-        } catch (NumberFormatException e) {
-
-            return true;
-        }
-    }
-
-    private boolean villeValide(Propriete propriete) {
-
-        String choix = comboVille.getValue();
-
-        if (choix == null || choix.equals("Toutes")) {
-            return true;
-        }
-
-        return propriete.getVille().equalsIgnoreCase(choix);
-    }
-
-    private boolean anneeValide(Propriete propriete) {
-
-        String texte = champAnneeMin.getText().trim();
-
-        if (texte.isEmpty()) {
-            return true;
-        }
-
-        try {
-
-            int anneeMin = Integer.parseInt(texte);
-
-            return propriete.getAnneeConstruction() >= anneeMin;
-
-        } catch (NumberFormatException e) {
-
-            return true;
-        }
+        afficherPage();
     }
 
     private void preparerPagination() {
 
         btnPrecedent.setOnAction(event -> {
 
-            if (pageActuelle > 1) {
+            service.pagePrecedente();
 
-                pageActuelle--;
-
-                afficherPage();
-            }
+            afficherPage();
         });
 
         btnSuivant.setOnAction(event -> {
 
-            int nombrePages = nombrePages();
+            service.pageSuivante();
 
-            if (pageActuelle < nombrePages) {
-
-                pageActuelle++;
-
-                afficherPage();
-            }
+            afficherPage();
         });
     }
 
     private void afficherPage() {
 
-        int debut = (pageActuelle - 1) * TAILLE_PAGE;
-
-        int fin = Math.min(
-                debut + TAILLE_PAGE,
-                proprietesFiltrees.size()
-        );
-
-        if (debut > proprietesFiltrees.size()) {
-            debut = 0;
-        }
-
-        List<Propriete> page = new ArrayList<>();
-
-        for (int i = debut; i < fin; i++) {
-            page.add(proprietesFiltrees.get(i));
-        }
-
         tableProprietes.setItems(
-                FXCollections.observableArrayList(page)
+                FXCollections.observableArrayList(
+                        service.pageCourante()
+                )
         );
-
-        int totalPages = nombrePages();
 
         labelPage.setText(
-                "Page " + pageActuelle + " / " + totalPages
+                "Page "
+                        + service.numeroPage()
+                        + " / "
+                        + service.nombrePages()
         );
 
-        btnPrecedent.setDisable(pageActuelle <= 1);
+        btnPrecedent.setDisable(
+                service.numeroPage() <= 1
+        );
 
-        btnSuivant.setDisable(pageActuelle >= totalPages);
-    }
-
-    private int nombrePages() {
-
-        if (proprietesFiltrees.isEmpty()) {
-            return 1;
-        }
-
-        return (int) Math.ceil(
-                (double) proprietesFiltrees.size() / TAILLE_PAGE
+        btnSuivant.setDisable(
+                service.numeroPage()
+                        >= service.nombrePages()
         );
     }
 
     private void preparerSelection() {
 
-        tableProprietes.getSelectionModel()
+        tableProprietes
+                .getSelectionModel()
                 .selectedItemProperty()
                 .addListener(
                         (observable, ancien, nouveau) -> {
@@ -496,7 +373,10 @@ public class ControleurPrincipal {
 
         labelPrix.setText(
                 "Prix : "
-                        + String.format("%.0f $", propriete.getPrix())
+                        + String.format(
+                        "%.0f $",
+                        propriete.getPrix()
+                )
         );
 
         labelTransaction.setText(
@@ -511,49 +391,55 @@ public class ControleurPrincipal {
                         + propriete.getVille()
         );
 
-        String infos = "";
+        StringBuilder infos = new StringBuilder();
 
-        infos += "Type : " + propriete.typeBien() + "\n";
+        infos.append("Type : ")
+                .append(propriete.typeBien())
+                .append("\n");
 
-        infos += "Chambres : "
-                + propriete.getChambres()
-                + "\n";
+        infos.append("Chambres : ")
+                .append(propriete.getChambres())
+                .append("\n");
 
-        infos += "Salles de bain : "
-                + propriete.getSallesBain()
-                + "\n";
+        infos.append("Salles de bain : ")
+                .append(propriete.getSallesBain())
+                .append("\n");
 
-        infos += "Superficie : "
-                + propriete.getSuperficie()
-                + " pi²\n";
+        infos.append("Superficie : ")
+                .append(propriete.getSuperficie())
+                .append(" pi²\n");
 
-        infos += "Année : "
-                + propriete.getAnneeConstruction()
-                + "\n";
+        infos.append("Année : ")
+                .append(propriete.getAnneeConstruction())
+                .append("\n");
 
-        infos += "Courtier : "
-                + propriete.getTypeCourtier()
-                + "\n";
+        infos.append("Courtier : ")
+                .append(propriete.getTypeCourtier())
+                .append("\n");
 
-        infos += "Prix au pi² : "
-                + String.format(
-                "%.2f $",
-                propriete.prixAuPiedCarre()
-        )
-                + "\n\n";
+        infos.append("Prix au pi² : ")
+                .append(
+                        String.format(
+                                "%.2f $",
+                                propriete.prixAuPiedCarre()
+                        )
+                )
+                .append("\n\n");
 
         for (Map.Entry<String, String> entree
                 : propriete.attributsSpecifiques().entrySet()) {
 
-            infos += entree.getKey()
-                    + " : "
-                    + entree.getValue()
-                    + "\n";
+            infos.append(entree.getKey())
+                    .append(" : ")
+                    .append(entree.getValue())
+                    .append("\n");
         }
 
-        infos += "\n"
-                + propriete.getDescription();
+        infos.append("\n")
+                .append(propriete.getDescription());
 
-        labelInfos.setText(infos);
+        labelInfos.setText(
+                infos.toString()
+        );
     }
 }

@@ -19,59 +19,20 @@ public abstract class Propriete {
     private final LocalDate datePubli;
     private final String description;
 
-    public String getId() {
-        return id;
-    }
-
-    public TypeTransaction getTypeTransaction() {
-        return typeTransaction;
-    }
-
-    public double getPrix() {
-        return prix;
-    }
-
-    public int getSuperficie() {
-        return superficie;
-    }
-
-    public int getChambres() {
-        return chambres;
-    }
-
-    public double getSallesBain() {
-        return sallesBain;
-    }
-
-    public String getVille() {
-        return ville;
-    }
-
-    public String getQuartier() {
-        return quartier;
-    }
-
-    public int getAnneeConstruction() {
-        return anneeConstruction;
-    }
-
-    public TypeCourtier getTypeCourtier() {
-        return typeCourtier;
-    }
-
-    public LocalDate getDatePubli() {
-        return datePubli;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Propriete(String id, TypeTransaction typeTransaction, double prix, int superficie,
-                     int chambres, double sallesBain, String ville, String quartier,
-                     int anneeConstruction, TypeCourtier typeCourtier, LocalDate datePubli,
-                     String description) {
-
+    public Propriete(
+            String id,
+            TypeTransaction typeTransaction,
+            double prix,
+            int superficie,
+            int chambres,
+            double sallesBain,
+            String ville,
+            String quartier,
+            int anneeConstruction,
+            TypeCourtier typeCourtier,
+            LocalDate datePubli,
+            String description
+    ) {
         this.id = Objects.requireNonNull(id);
         this.typeTransaction = Objects.requireNonNull(typeTransaction);
 
