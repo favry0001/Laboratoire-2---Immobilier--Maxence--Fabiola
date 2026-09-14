@@ -26,6 +26,10 @@
                           promptText="Trier par"
                           prefWidth="220" />
 
+                <Button fx:id="btnBenchmark"
+                        text="Benchmark"
+                        onAction="#ouvrirBenchmark" />
+
             </HBox>
 
             <HBox spacing="10">

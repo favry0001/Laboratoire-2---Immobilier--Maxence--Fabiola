@@ -12,8 +12,12 @@ import immobilier.util.LecteurCSV;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -66,6 +70,9 @@ public class ControleurPrincipal {
 
     @FXML
     private Button btnFavoris;
+
+    @FXML
+    private Button btnBenchmark;
 
     @FXML
     private Label labelPage;
@@ -441,5 +448,27 @@ public class ControleurPrincipal {
         labelInfos.setText(
                 infos.toString()
         );
+    }
+
+    @FXML
+    private void ouvrirBenchmark() {
+
+        try {
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/vue-benchmark.fxml")
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = new Stage();
+
+            stage.setTitle("Benchmark des algorithmes");
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
