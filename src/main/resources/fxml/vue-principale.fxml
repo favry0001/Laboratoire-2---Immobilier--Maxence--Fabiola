@@ -133,7 +133,23 @@
                 </TableView>
 
                 <HBox spacing="10"
-                      alignment="CENTER_RIGHT">
+                      alignment="CENTER_LEFT">
+
+                    <Button fx:id="btnAjouter"
+                            text="Ajouter"
+                            styleClass="primary-button"/>
+
+                    <Button fx:id="btnModifier"
+                            text="Modifier"
+                            disable="true"
+                            styleClass="secondary-button"/>
+
+                    <Button fx:id="btnSupprimer"
+                            text="Supprimer"
+                            disable="true"
+                            styleClass="secondary-button"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
 
                     <Button fx:id="btnPrecedent"
                             text="Précédent"

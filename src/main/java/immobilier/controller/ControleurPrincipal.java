@@ -24,93 +24,53 @@ import java.util.Map;
 
 public class ControleurPrincipal {
 
-    @FXML
-    private TextField champRecherche;
+    @FXML private TextField champRecherche;
+    @FXML private TextField champPrixMax;
 
-    @FXML
-    private ComboBox<String> comboTri;
+    @FXML private ComboBox<String> comboTri;
+    @FXML private ComboBox<String> comboTransaction;
+    @FXML private ComboBox<String> comboType;
+    @FXML private ComboBox<String> comboChambres;
+    @FXML private ComboBox<String> comboVille;
 
-    @FXML
-    private ComboBox<String> comboTransaction;
+    @FXML private TableView<Propriete> tableProprietes;
+    @FXML private TableColumn<Propriete, String> colPrix;
+    @FXML private TableColumn<Propriete, String> colType;
+    @FXML private TableColumn<Propriete, String> colVille;
+    @FXML private TableColumn<Propriete, String> colChambres;
+    @FXML private TableColumn<Propriete, String> colSuperficie;
 
-    @FXML
-    private ComboBox<String> comboType;
+    @FXML private Button btnAjouter;
+    @FXML private Button btnModifier;
+    @FXML private Button btnSupprimer;
+    @FXML private Button btnPrecedent;
+    @FXML private Button btnSuivant;
+    @FXML private Button btnFavoris;
+    @FXML private Button btnBenchmark;
 
-    @FXML
-    private TextField champPrixMax;
-
-    @FXML
-    private ComboBox<String> comboChambres;
-
-    @FXML
-    private ComboBox<String> comboVille;
-
-    @FXML
-    private TableView<Propriete> tableProprietes;
-
-    @FXML
-    private TableColumn<Propriete, String> colPrix;
-
-    @FXML
-    private TableColumn<Propriete, String> colType;
-
-    @FXML
-    private TableColumn<Propriete, String> colVille;
-
-    @FXML
-    private TableColumn<Propriete, String> colChambres;
-
-    @FXML
-    private TableColumn<Propriete, String> colSuperficie;
-
-    @FXML
-    private Button btnPrecedent;
-
-    @FXML
-    private Button btnSuivant;
-
-    @FXML
-    private Button btnFavoris;
-
-    @FXML
-    private Button btnBenchmark;
-
-    @FXML
-    private Label labelPage;
-
-    @FXML
-    private Label labelPrix;
-
-    @FXML
-    private Label labelTransaction;
-
-    @FXML
-    private Label labelAdresse;
-
-    @FXML
-    private Label labelInfos;
+    @FXML private Label labelPage;
+    @FXML private Label labelPrix;
+    @FXML private Label labelTransaction;
+    @FXML private Label labelAdresse;
+    @FXML private Label labelInfos;
 
     private final ServiceCatalogue service =
             new ServiceCatalogueImpl(new LecteurCSV());
 
-    private final Favoris favoris =
-            new Favoris();
+    private final Favoris favoris = new Favoris();
 
     @FXML
     public void initialize() {
-
         preparerMenus();
         preparerTableau();
         preparerRechercheEtFiltres();
         preparerPagination();
         preparerSelection();
         preparerFavoris();
-
         afficherPage();
     }
 
     private void preparerMenus() {
-
         comboTri.getItems().addAll(
                 "Prix croissant",
                 "Prix décroissant",
@@ -121,30 +81,20 @@ public class ControleurPrincipal {
         );
 
         comboTransaction.getItems().addAll(
-                "Toutes",
-                "Vente",
-                "Location"
+                "Toutes", "Vente", "Location"
         );
 
         comboType.getItems().addAll(
-                "Toutes",
-                "Maison",
-                "Condo"
+                "Toutes", "Maison", "Condo"
         );
 
         comboChambres.getItems().addAll(
-                "Toutes",
-                "1+",
-                "2+",
-                "3+",
-                "4+",
-                "5+"
+                "Toutes", "1+", "2+", "3+", "4+", "5+"
         );
 
         comboVille.getItems().add("Toutes");
 
         for (Propriete propriete : service.toutesLesDonnees()) {
-
             String ville = propriete.getVille();
 
             if (!comboVille.getItems().contains(ville)) {
@@ -159,155 +109,99 @@ public class ControleurPrincipal {
     }
 
     private void preparerTableau() {
-
         colPrix.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        String.format(
-                                "%.0f $",
-                                data.getValue().getPrix()
-                        )
+                        String.format("%.0f $", data.getValue().getPrix())
                 )
         );
 
         colType.setCellValueFactory(data ->
-                new SimpleStringProperty(
-                        data.getValue().typeBien()
-                )
+                new SimpleStringProperty(data.getValue().typeBien())
         );
 
         colVille.setCellValueFactory(data ->
-                new SimpleStringProperty(
-                        data.getValue().getVille()
-                )
+                new SimpleStringProperty(data.getValue().getVille())
         );
 
         colChambres.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        String.valueOf(
-                                data.getValue().getChambres()
-                        )
+                        String.valueOf(data.getValue().getChambres())
                 )
         );
 
         colSuperficie.setCellValueFactory(data ->
                 new SimpleStringProperty(
-                        data.getValue().getSuperficie()
-                                + " pi²"
+                        data.getValue().getSuperficie() + " pi²"
                 )
         );
     }
 
     private void preparerRechercheEtFiltres() {
-
         champRecherche.textProperty().addListener(
                 (observable, ancien, nouveau) -> {
-
                     service.rechercher(nouveau);
                     afficherPage();
                 }
         );
 
         champPrixMax.textProperty().addListener(
-                (observable, ancien, nouveau) ->
-                        appliquerFiltres()
+                (observable, ancien, nouveau) -> appliquerFiltres()
         );
 
-        comboTransaction.setOnAction(
-                event -> appliquerFiltres()
-        );
-
-        comboType.setOnAction(
-                event -> appliquerFiltres()
-        );
-
-        comboChambres.setOnAction(
-                event -> appliquerFiltres()
-        );
-
-        comboVille.setOnAction(
-                event -> appliquerFiltres()
-        );
-
-        comboTri.setOnAction(
-                event -> appliquerTri()
-        );
+        comboTransaction.setOnAction(event -> appliquerFiltres());
+        comboType.setOnAction(event -> appliquerFiltres());
+        comboChambres.setOnAction(event -> appliquerFiltres());
+        comboVille.setOnAction(event -> appliquerFiltres());
+        comboTri.setOnAction(event -> appliquerTri());
     }
 
     private void appliquerFiltres() {
+        CritereFiltre criteres = new CritereFiltre();
 
-        CritereFiltre criteres =
-                new CritereFiltre();
-
-        String transaction =
-                comboTransaction.getValue();
+        String transaction = comboTransaction.getValue();
 
         if ("Vente".equals(transaction)) {
-            criteres.setTransaction(
-                    TypeTransaction.VENTE
-            );
+            criteres.setTransaction(TypeTransaction.VENTE);
+        } else if ("Location".equals(transaction)) {
+            criteres.setTransaction(TypeTransaction.LOCATION);
         }
 
-        if ("Location".equals(transaction)) {
-            criteres.setTransaction(
-                    TypeTransaction.LOCATION
-            );
-        }
+        String type = comboType.getValue();
 
-        String type =
-                comboType.getValue();
-
-        if (type != null
-                && !"Toutes".equals(type)) {
-
+        if (type != null && !"Toutes".equals(type)) {
             criteres.setTypeBien(type);
         }
 
-        String prix =
-                champPrixMax.getText().trim();
+        String prix = champPrixMax.getText().trim();
 
         if (!prix.isEmpty()) {
-
             try {
-
-                criteres.setPrixMax(
-                        Double.parseDouble(prix)
-                );
-
+                criteres.setPrixMax(Double.parseDouble(prix));
             } catch (NumberFormatException ignored) {
+                // Le filtre de prix est ignoré si la saisie est invalide.
             }
         }
 
-        String chambres =
-                comboChambres.getValue();
+        String chambres = comboChambres.getValue();
 
-        if (chambres != null
-                && !"Toutes".equals(chambres)) {
-
+        if (chambres != null && !"Toutes".equals(chambres)) {
             criteres.setChambresMin(
-                    Integer.parseInt(
-                            chambres.replace("+", "")
-                    )
+                    Integer.parseInt(chambres.replace("+", ""))
             );
         }
 
-        String ville =
-                comboVille.getValue();
+        String ville = comboVille.getValue();
 
-        if (ville != null
-                && !"Toutes".equals(ville)) {
-
+        if (ville != null && !"Toutes".equals(ville)) {
             criteres.setVille(ville);
         }
 
         service.appliquerFiltres(criteres);
-
         afficherPage();
     }
 
     private void appliquerTri() {
-
-        String choix =
-                comboTri.getValue();
+        String choix = comboTri.getValue();
 
         if (choix == null) {
             return;
@@ -316,286 +210,195 @@ public class ControleurPrincipal {
         Comparator<Propriete> comparateur;
 
         switch (choix) {
-
             case "Prix croissant" ->
-                    comparateur =
-                            Comparateurs.parPrixCroissant();
+                    comparateur = Comparateurs.parPrixCroissant();
 
             case "Prix décroissant" ->
-                    comparateur =
-                            Comparateurs.parPrixDecroissant();
+                    comparateur = Comparateurs.parPrixDecroissant();
 
             case "Superficie décroissante" ->
-                    comparateur =
-                            Comparateurs.parSuperficieDecroissante();
+                    comparateur = Comparateurs.parSuperficieDecroissante();
 
             case "Année de construction" ->
-                    comparateur =
-                            Comparator.comparingInt(
-                                    Propriete::getAnneeConstruction
-                            );
+                    comparateur = Comparator.comparingInt(
+                            Propriete::getAnneeConstruction
+                    );
 
             case "Date de publication" ->
-                    comparateur =
-                            Comparator.comparing(
-                                    Propriete::getDatePubli
-                            );
+                    comparateur = Comparator.comparing(
+                            Propriete::getDatePubli
+                    );
 
             case "Prix au pied carré" ->
-                    comparateur =
-                            Comparateurs.parPrixAuPiedCarre();
+                    comparateur = Comparateurs.parPrixAuPiedCarre();
 
             default -> {
                 return;
             }
         }
 
-        service.trier(
-                comparateur,
-                new TriFusion<>()
-        );
-
+        service.trier(comparateur, new TriFusion<>());
         afficherPage();
     }
 
     private void preparerPagination() {
-
         btnPrecedent.setOnAction(event -> {
-
             service.pagePrecedente();
             afficherPage();
         });
 
         btnSuivant.setOnAction(event -> {
-
             service.pageSuivante();
             afficherPage();
         });
     }
 
     private void afficherPage() {
-
         tableProprietes.setItems(
-                FXCollections.observableArrayList(
-                        service.pageCourante()
-                )
+                FXCollections.observableArrayList(service.pageCourante())
         );
 
         labelPage.setText(
-                "Page "
-                        + service.numeroPage()
-                        + " / "
-                        + service.nombrePages()
+                "Page " + service.numeroPage() + " / " + service.nombrePages()
         );
 
-        btnPrecedent.setDisable(
-                service.numeroPage() <= 1
-        );
-
+        btnPrecedent.setDisable(service.numeroPage() <= 1);
         btnSuivant.setDisable(
-                service.numeroPage()
-                        >= service.nombrePages()
+                service.numeroPage() >= service.nombrePages()
+        );
+
+        mettreAJourSelection(
+                tableProprietes.getSelectionModel().getSelectedItem()
         );
     }
 
     private void preparerSelection() {
+        mettreAJourSelection(null);
 
-        tableProprietes
-                .getSelectionModel()
+        tableProprietes.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(
-                        (observable, ancien, nouveau) -> {
-
-                            if (nouveau != null) {
-
-                                afficherDetails(nouveau);
-                                mettreAJourBoutonFavoris(nouveau);
-
-                            } else {
-
-                                btnFavoris.setDisable(true);
-                            }
-                        }
+                        (observable, ancien, nouveau) ->
+                                mettreAJourSelection(nouveau)
                 );
     }
 
+    private void mettreAJourSelection(Propriete propriete) {
+        boolean aucuneSelection = propriete == null;
+
+        btnModifier.setDisable(aucuneSelection);
+        btnSupprimer.setDisable(aucuneSelection);
+        btnFavoris.setDisable(aucuneSelection);
+
+        if (aucuneSelection) {
+            effacerDetails();
+        } else {
+            afficherDetails(propriete);
+            mettreAJourBoutonFavoris(propriete);
+        }
+    }
+
+    private void effacerDetails() {
+        labelPrix.setText("Prix :");
+        labelTransaction.setText("Transaction :");
+        labelAdresse.setText("Adresse :");
+        labelInfos.setText("");
+        btnFavoris.setText("Ajouter aux favoris");
+    }
+
     private void preparerFavoris() {
-
-        btnFavoris.setDisable(true);
-
         btnFavoris.setOnAction(event -> {
-
             Propriete propriete =
-                    tableProprietes
-                            .getSelectionModel()
-                            .getSelectedItem();
+                    tableProprietes.getSelectionModel().getSelectedItem();
 
             if (propriete == null) {
                 return;
             }
 
             favoris.basculer(propriete);
-
             mettreAJourBoutonFavoris(propriete);
-
-            System.out.println(
-                    "Nombre de favoris : "
-                            + favoris.taille()
-            );
         });
     }
 
-    private void mettreAJourBoutonFavoris(
-            Propriete propriete
-    ) {
-
+    private void mettreAJourBoutonFavoris(Propriete propriete) {
         btnFavoris.setDisable(false);
 
         if (favoris.contient(propriete)) {
-
-            btnFavoris.setText(
-                    "Retirer des favoris"
-            );
-
+            btnFavoris.setText("Retirer des favoris");
         } else {
-
-            btnFavoris.setText(
-                    "Ajouter aux favoris"
-            );
+            btnFavoris.setText("Ajouter aux favoris");
         }
     }
 
-    private void afficherDetails(
-            Propriete propriete
-    ) {
-
+    private void afficherDetails(Propriete propriete) {
         labelPrix.setText(
-                "Prix : "
-                        + String.format(
-                        "%.0f $",
-                        propriete.getPrix()
-                )
+                "Prix : " + String.format("%.0f $", propriete.getPrix())
         );
 
         labelTransaction.setText(
-                "Transaction : "
-                        + propriete.getTypeTransaction()
+                "Transaction : " + propriete.getTypeTransaction()
         );
 
         labelAdresse.setText(
-                "Adresse : "
-                        + propriete.getQuartier()
-                        + ", "
-                        + propriete.getVille()
+                "Adresse : " + propriete.getQuartier()
+                        + ", " + propriete.getVille()
         );
 
-        StringBuilder infos =
-                new StringBuilder();
+        StringBuilder infos = new StringBuilder();
 
-        infos.append("Type : ")
-                .append(
-                        propriete.typeBien()
-                )
-                .append("\n");
-
-        infos.append("Chambres : ")
-                .append(
-                        propriete.getChambres()
-                )
-                .append("\n");
-
+        infos.append("Type : ").append(propriete.typeBien()).append("\n");
+        infos.append("Chambres : ").append(propriete.getChambres()).append("\n");
         infos.append("Salles de bain : ")
-                .append(
-                        propriete.getSallesBain()
-                )
-                .append("\n");
-
+                .append(propriete.getSallesBain()).append("\n");
         infos.append("Superficie : ")
-                .append(
-                        propriete.getSuperficie()
-                )
-                .append(" pi²\n");
-
+                .append(propriete.getSuperficie()).append(" pi²\n");
         infos.append("Année : ")
-                .append(
-                        propriete.getAnneeConstruction()
-                )
-                .append("\n");
-
+                .append(propriete.getAnneeConstruction()).append("\n");
         infos.append("Courtier : ")
-                .append(
-                        propriete.getTypeCourtier()
-                )
-                .append("\n");
-
+                .append(propriete.getTypeCourtier()).append("\n");
         infos.append("Prix au pi² : ")
-                .append(
-                        String.format(
-                                "%.2f $",
-                                propriete.prixAuPiedCarre()
-                        )
-                )
+                .append(String.format("%.2f $", propriete.prixAuPiedCarre()))
                 .append("\n\n");
 
         for (Map.Entry<String, String> entree
-                : propriete
-                .attributsSpecifiques()
-                .entrySet()) {
-
+                : propriete.attributsSpecifiques().entrySet()) {
             infos.append(entree.getKey())
                     .append(" : ")
                     .append(entree.getValue())
                     .append("\n");
         }
 
-        infos.append("\n")
-                .append(
-                        propriete.getDescription()
-                );
-
-        labelInfos.setText(
-                infos.toString()
-        );
+        infos.append("\n").append(propriete.getDescription());
+        labelInfos.setText(infos.toString());
     }
 
     @FXML
     private void ouvrirBenchmark() {
-
         try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/vue-benchmark.fxml")
+            );
 
-            FXMLLoader loader =
-                    new FXMLLoader(
-                            getClass().getResource(
-                                    "/fxml/vue-benchmark.fxml"
-                            )
-                    );
-
-            Scene scene =
-                    new Scene(
-                            loader.load()
-                    );
+            Scene scene = new Scene(loader.load());
 
             scene.getStylesheets().add(
-                    getClass()
-                            .getResource(
-                                    "/css/style.css"
-                            )
-                            .toExternalForm()
+                    getClass().getResource("/css/style.css").toExternalForm()
             );
 
-            Stage stage =
-                    new Stage();
-
-            stage.setTitle(
-                    "Benchmark des algorithmes"
-            );
-
+            Stage stage = new Stage();
+            stage.setTitle("Benchmark des algorithmes");
             stage.setScene(scene);
             stage.show();
 
         } catch (IOException e) {
-
-            e.printStackTrace();
+            Alert alerte = new Alert(Alert.AlertType.ERROR);
+            alerte.setTitle("Erreur");
+            alerte.setHeaderText("Impossible d’ouvrir le benchmark");
+            alerte.setContentText(
+                    "Vérifie que le fichier vue-benchmark.fxml est présent "
+                            + "et correctement configuré."
+            );
+            alerte.showAndWait();
         }
     }
 }
