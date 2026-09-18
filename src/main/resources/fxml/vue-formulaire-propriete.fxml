@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="immobilier.controller.ControleurFormulairePropriete"
+      spacing="15"
+      prefWidth="600"
+      prefHeight="700"
+      style="-fx-padding: 20;"
+      styleClass="main-card">
+
+    <Label fx:id="labelTitre"
+           text="Ajouter une propriété"
+           styleClass="section-title"/>
+
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS">
+
+        <content>
+            <VBox spacing="15"
+                  style="-fx-padding: 10;">
+
+                <GridPane hgap="15"
+                          vgap="12">
+
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="150"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Type de bien"
+                           GridPane.rowIndex="0"/>
+
+                    <ComboBox fx:id="comboTypeBien"
+                              maxWidth="Infinity"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="0"/>
+
+                    <Label text="Transaction"
+                           GridPane.rowIndex="1"/>
+
+                    <ComboBox fx:id="comboTransaction"
+                              maxWidth="Infinity"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="1"/>
+
+                    <Label text="Prix ($)"
+                           GridPane.rowIndex="2"/>
+
+                    <TextField fx:id="champPrix"
+                               promptText="Ex. : 350000"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="2"/>
+
+                    <Label text="Superficie (pi²)"
+                           GridPane.rowIndex="3"/>
+
+                    <TextField fx:id="champSuperficie"
+                               promptText="Ex. : 1200"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="3"/>
+
+                    <Label text="Chambres"
+                           GridPane.rowIndex="4"/>
+
+                    <TextField fx:id="champChambres"
+                               promptText="Ex. : 3"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="4"/>
+
+                    <Label text="Salles de bain"
+                           GridPane.rowIndex="5"/>
+
+                    <TextField fx:id="champSallesBain"
+                               promptText="Ex. : 1.5"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="5"/>
+
+                    <Label text="Ville"
+                           GridPane.rowIndex="6"/>
+
+                    <TextField fx:id="champVille"
+                               promptText="Ex. : Montréal"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="6"/>
+
+                    <Label text="Quartier"
+                           GridPane.rowIndex="7"/>
+
+                    <TextField fx:id="champQuartier"
+                               promptText="Ex. : Rosemont"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="7"/>
+
+                    <Label text="Année de construction"
+                           GridPane.rowIndex="8"/>
+
+                    <TextField fx:id="champAnnee"
+                               promptText="Ex. : 2005"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="8"/>
+
+                    <Label text="Type de vendeur"
+                           GridPane.rowIndex="9"/>
+
+                    <ComboBox fx:id="comboCourtier"
+                              maxWidth="Infinity"
+                              GridPane.columnIndex="1"
+                              GridPane.rowIndex="9"/>
+
+                    <Label text="Date de publication"
+                           GridPane.rowIndex="10"/>
+
+                    <DatePicker fx:id="datePublication"
+                                maxWidth="Infinity"
+                                GridPane.columnIndex="1"
+                                GridPane.rowIndex="10"/>
+
+                </GridPane>
+
+                <Separator/>
+
+                <VBox fx:id="blocMaison"
+                      spacing="10">
+
+                    <Label text="Informations de la maison"
+                           styleClass="detail-label"/>
+
+                    <GridPane hgap="15"
+                              vgap="12">
+
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="150"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="Terrain (pi²)"
+                               GridPane.rowIndex="0"/>
+
+                        <TextField fx:id="champTerrain"
+                                   promptText="Ex. : 4000"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="0"/>
+
+                        <Label text="Nombre d’étages"
+                               GridPane.rowIndex="1"/>
+
+                        <TextField fx:id="champEtages"
+                                   promptText="Ex. : 2"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
+
+                        <CheckBox fx:id="checkGarage"
+                                  text="Garage"
+                                  GridPane.columnIndex="1"
+                                  GridPane.rowIndex="2"/>
+
+                    </GridPane>
+
+                </VBox>
+
+                <VBox fx:id="blocCondo"
+                      spacing="10"
+                      visible="false"
+                      managed="false">
+
+                    <Label text="Informations du condo"
+                           styleClass="detail-label"/>
+
+                    <GridPane hgap="15"
+                              vgap="12">
+
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="150"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <Label text="Étage de l’unité"
+                               GridPane.rowIndex="0"/>
+
+                        <TextField fx:id="champEtageUnite"
+                                   promptText="Ex. : 4"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="0"/>
+
+                        <Label text="Frais de condo ($)"
+                               GridPane.rowIndex="1"/>
+
+                        <TextField fx:id="champFraisCondo"
+                                   promptText="Ex. : 250"
+                                   GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
+
+                        <CheckBox fx:id="checkAscenseur"
+                                  text="Ascenseur"
+                                  GridPane.columnIndex="1"
+                                  GridPane.rowIndex="2"/>
+
+                    </GridPane>
+
+                </VBox>
+
+                <Separator/>
+
+                <Label text="Description"
+                       styleClass="detail-label"/>
+
+                <TextArea fx:id="champDescription"
+                          promptText="Décris la propriété"
+                          wrapText="true"
+                          prefRowCount="3"/>
+
+            </VBox>
+        </content>
+
+    </ScrollPane>
+
+    <HBox spacing="10"
+          alignment="CENTER_RIGHT">
+
+        <Button fx:id="btnAnnuler"
+                text="Annuler"
+                styleClass="secondary-button"/>
+
+        <Button fx:id="btnEnregistrer"
+                text="Enregistrer"
+                styleClass="primary-button"/>
+
+    </HBox>
+
+</VBox>

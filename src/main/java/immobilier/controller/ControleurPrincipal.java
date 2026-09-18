@@ -16,11 +16,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 
 public class ControleurPrincipal {
 
@@ -67,6 +69,7 @@ public class ControleurPrincipal {
         preparerPagination();
         preparerSelection();
         preparerFavoris();
+        preparerFormulaire();
         afficherPage();
     }
 
@@ -372,6 +375,66 @@ public class ControleurPrincipal {
         labelInfos.setText(infos.toString());
     }
 
+    private void preparerFormulaire() {
+        btnAjouter.setOnAction(event -> ouvrirFormulaire(null));
+
+        btnModifier.setOnAction(event -> {
+            Propriete selection =
+                    tableProprietes.getSelectionModel().getSelectedItem();
+
+            if (selection != null) {
+                ouvrirFormulaire(selection);
+            }
+        });
+    }
+
+    private Optional<Propriete> ouvrirFormulaire(Propriete propriete) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/fxml/vue-formulaire-propriete.fxml"
+                    )
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            scene.getStylesheets().add(
+                    getClass().getResource("/css/style.css").toExternalForm()
+            );
+
+            ControleurFormulairePropriete controleur =
+                    loader.getController();
+
+            if (propriete != null) {
+                controleur.preparerModification(propriete);
+            }
+
+            Stage fenetre = new Stage();
+
+            fenetre.setTitle(
+                    propriete == null
+                            ? "Ajouter une propriété"
+                            : "Modifier une propriété"
+            );
+
+            fenetre.initOwner(tableProprietes.getScene().getWindow());
+            fenetre.initModality(Modality.WINDOW_MODAL);
+            fenetre.setScene(scene);
+            fenetre.showAndWait();
+
+            // Le résultat sera transmis au service à l'intégration du DAO.
+            return controleur.getResultat();
+
+        } catch (IOException | RuntimeException e) {
+            afficherErreur(
+                    "Impossible d’ouvrir le formulaire",
+                    "Détail : " + e.getMessage()
+            );
+
+            return Optional.empty();
+        }
+    }
+
     @FXML
     private void ouvrirBenchmark() {
         try {
@@ -390,15 +453,20 @@ public class ControleurPrincipal {
             stage.setScene(scene);
             stage.show();
 
-        } catch (IOException e) {
-            Alert alerte = new Alert(Alert.AlertType.ERROR);
-            alerte.setTitle("Erreur");
-            alerte.setHeaderText("Impossible d’ouvrir le benchmark");
-            alerte.setContentText(
-                    "Vérifie que le fichier vue-benchmark.fxml est présent "
-                            + "et correctement configuré."
+        } catch (IOException | RuntimeException e) {
+            afficherErreur(
+                    "Impossible d’ouvrir le benchmark",
+                    "Détail : " + e.getMessage()
             );
-            alerte.showAndWait();
         }
+    }
+
+    private void afficherErreur(String titre, String message) {
+        Alert alerte = new Alert(Alert.AlertType.ERROR);
+        alerte.initOwner(tableProprietes.getScene().getWindow());
+        alerte.setTitle("Erreur");
+        alerte.setHeaderText(titre);
+        alerte.setContentText(message);
+        alerte.showAndWait();
     }
 }
