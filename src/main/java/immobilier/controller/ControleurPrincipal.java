@@ -70,6 +70,7 @@ public class ControleurPrincipal {
         preparerSelection();
         preparerFavoris();
         preparerFormulaire();
+        preparerSuppression();
         afficherPage();
     }
 
@@ -181,7 +182,6 @@ public class ControleurPrincipal {
             try {
                 criteres.setPrixMax(Double.parseDouble(prix));
             } catch (NumberFormatException ignored) {
-                // Le filtre de prix est ignoré si la saisie est invalide.
             }
         }
 
@@ -262,7 +262,8 @@ public class ControleurPrincipal {
         );
 
         labelPage.setText(
-                "Page " + service.numeroPage() + " / " + service.nombrePages()
+                "Page " + service.numeroPage()
+                        + " / " + service.nombrePages()
         );
 
         btnPrecedent.setDisable(service.numeroPage() <= 1);
@@ -349,18 +350,35 @@ public class ControleurPrincipal {
 
         StringBuilder infos = new StringBuilder();
 
-        infos.append("Type : ").append(propriete.typeBien()).append("\n");
-        infos.append("Chambres : ").append(propriete.getChambres()).append("\n");
+        infos.append("Type : ")
+                .append(propriete.typeBien())
+                .append("\n");
+
+        infos.append("Chambres : ")
+                .append(propriete.getChambres())
+                .append("\n");
+
         infos.append("Salles de bain : ")
-                .append(propriete.getSallesBain()).append("\n");
+                .append(propriete.getSallesBain())
+                .append("\n");
+
         infos.append("Superficie : ")
-                .append(propriete.getSuperficie()).append(" pi²\n");
+                .append(propriete.getSuperficie())
+                .append(" pi²\n");
+
         infos.append("Année : ")
-                .append(propriete.getAnneeConstruction()).append("\n");
+                .append(propriete.getAnneeConstruction())
+                .append("\n");
+
         infos.append("Courtier : ")
-                .append(propriete.getTypeCourtier()).append("\n");
+                .append(propriete.getTypeCourtier())
+                .append("\n");
+
         infos.append("Prix au pi² : ")
-                .append(String.format("%.2f $", propriete.prixAuPiedCarre()))
+                .append(String.format(
+                        "%.2f $",
+                        propriete.prixAuPiedCarre()
+                ))
                 .append("\n\n");
 
         for (Map.Entry<String, String> entree
@@ -388,7 +406,9 @@ public class ControleurPrincipal {
         });
     }
 
-    private Optional<Propriete> ouvrirFormulaire(Propriete propriete) {
+    private Optional<Propriete> ouvrirFormulaire(
+            Propriete propriete
+    ) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource(
@@ -399,7 +419,9 @@ public class ControleurPrincipal {
             Scene scene = new Scene(loader.load());
 
             scene.getStylesheets().add(
-                    getClass().getResource("/css/style.css").toExternalForm()
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
             );
 
             ControleurFormulairePropriete controleur =
@@ -417,12 +439,13 @@ public class ControleurPrincipal {
                             : "Modifier une propriété"
             );
 
-            fenetre.initOwner(tableProprietes.getScene().getWindow());
+            fenetre.initOwner(
+                    tableProprietes.getScene().getWindow()
+            );
             fenetre.initModality(Modality.WINDOW_MODAL);
             fenetre.setScene(scene);
             fenetre.showAndWait();
 
-            // Le résultat sera transmis au service à l'intégration du DAO.
             return controleur.getResultat();
 
         } catch (IOException | RuntimeException e) {
@@ -435,17 +458,101 @@ public class ControleurPrincipal {
         }
     }
 
+    private void preparerSuppression() {
+        btnSupprimer.setOnAction(
+                event -> demanderSuppression()
+        );
+    }
+
+    private void demanderSuppression() {
+        Propriete selection =
+                tableProprietes.getSelectionModel().getSelectedItem();
+
+        if (selection == null) {
+            return;
+        }
+
+        ButtonType boutonSupprimer = new ButtonType(
+                "Supprimer",
+                ButtonBar.ButtonData.OK_DONE
+        );
+
+        ButtonType boutonAnnuler = new ButtonType(
+                "Annuler",
+                ButtonBar.ButtonData.CANCEL_CLOSE
+        );
+
+        Alert confirmation = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "",
+                boutonSupprimer,
+                boutonAnnuler
+        );
+
+        confirmation.initOwner(
+                tableProprietes.getScene().getWindow()
+        );
+
+        confirmation.setTitle("Confirmer la suppression");
+        confirmation.setHeaderText(
+                "Supprimer cette propriété ?"
+        );
+
+        confirmation.setContentText(
+                selection.typeBien()
+                        + " à " + selection.getVille()
+                        + "\nQuartier : "
+                        + selection.getQuartier()
+                        + "\nPrix : "
+                        + String.format(
+                        "%.0f $",
+                        selection.getPrix()
+                )
+                        + "\n\nCette action sera définitive."
+        );
+
+        Optional<ButtonType> reponse =
+                confirmation.showAndWait();
+
+        if (reponse.isEmpty()
+                || reponse.get() != boutonSupprimer) {
+            return;
+        }
+
+        Alert information =
+                new Alert(Alert.AlertType.INFORMATION);
+
+        information.initOwner(
+                tableProprietes.getScene().getWindow()
+        );
+
+        information.setTitle("Suppression");
+        information.setHeaderText(
+                "Aucune propriété supprimée"
+        );
+
+        information.setContentText(
+                "La suppression n’est pas encore disponible."
+        );
+
+        information.showAndWait();
+    }
+
     @FXML
     private void ouvrirBenchmark() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/vue-benchmark.fxml")
+                    getClass().getResource(
+                            "/fxml/vue-benchmark.fxml"
+                    )
             );
 
             Scene scene = new Scene(loader.load());
 
             scene.getStylesheets().add(
-                    getClass().getResource("/css/style.css").toExternalForm()
+                    getClass()
+                            .getResource("/css/style.css")
+                            .toExternalForm()
             );
 
             Stage stage = new Stage();
@@ -461,9 +568,16 @@ public class ControleurPrincipal {
         }
     }
 
-    private void afficherErreur(String titre, String message) {
+    private void afficherErreur(
+            String titre,
+            String message
+    ) {
         Alert alerte = new Alert(Alert.AlertType.ERROR);
-        alerte.initOwner(tableProprietes.getScene().getWindow());
+
+        alerte.initOwner(
+                tableProprietes.getScene().getWindow()
+        );
+
         alerte.setTitle("Erreur");
         alerte.setHeaderText(titre);
         alerte.setContentText(message);
