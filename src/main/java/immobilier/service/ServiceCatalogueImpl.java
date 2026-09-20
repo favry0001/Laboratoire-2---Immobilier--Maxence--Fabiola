@@ -3,6 +3,7 @@ package immobilier.service;
 import immobilier.algorithmes.Algorithme;
 import immobilier.dao.ProprieteDao;
 import immobilier.model.Propriete;
+import immobilier.util.SourceDonnees;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
 
     private static final int TAILLE_PAGE_DEFAUT = 25;
 
+    private final SourceDonnees sourceDonnees;
     private final ProprieteDao dao;
     private List<Propriete> donnees;
     private List<Propriete> resultats;
@@ -21,22 +23,19 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
     private int taillePage = TAILLE_PAGE_DEFAUT;
     private int page = 0;
 
-    public ServiceCatalogueImpl(ProprieteDao dao) {
-        this.dao = dao;
-        try {
-            this.donnees = dao.trouverTous();
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur chargement initial", e);
-        }
+    public ServiceCatalogueImpl(SourceDonnees sourceDonnees) {
+        this.sourceDonnees = sourceDonnees;
+        this.dao = sourceDonnees instanceof ProprieteDao proprieteDao
+                ? proprieteDao
+                : null;
+        this.donnees = chargerDonnees();
         this.resultats = new ArrayList<>(donnees);
     }
-
-    // CRUD
 
     @Override
     public void ajouter(Propriete propriete) {
         try {
-            dao.ajouter(propriete);
+            obtenirDao().ajouter(propriete);
             recharger();
         } catch (Exception e) {
             throw new RuntimeException("Erreur ajout", e);
@@ -46,9 +45,9 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
     @Override
     public boolean modifier(Propriete propriete) {
         try {
-            boolean ok = dao.modifier(propriete);
+            boolean modifiee = obtenirDao().modifier(propriete);
             recharger();
-            return ok;
+            return modifiee;
         } catch (Exception e) {
             throw new RuntimeException("Erreur modification", e);
         }
@@ -57,25 +56,36 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
     @Override
     public boolean supprimer(String id) {
         try {
-            boolean ok = dao.supprimer(id);
+            boolean supprimee = obtenirDao().supprimer(id);
             recharger();
-            return ok;
+            return supprimee;
         } catch (Exception e) {
             throw new RuntimeException("Erreur suppression", e);
         }
     }
 
-
-    private void recharger() {
-        try {
-            this.donnees = dao.trouverTous();
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur rechargement", e);
+    private ProprieteDao obtenirDao() {
+        if (dao == null) {
+            throw new IllegalStateException(
+                    "Les modifications sont indisponibles avec la source CSV."
+            );
         }
-        recalculer();
+
+        return dao;
     }
 
-    // Filtres et recherche
+    private List<Propriete> chargerDonnees() {
+        try {
+            return sourceDonnees.charger();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur chargement des données", e);
+        }
+    }
+
+    private void recharger() {
+        donnees = chargerDonnees();
+        recalculer();
+    }
 
     @Override
     public void appliquerFiltres(CritereFiltre criteres) {
@@ -85,72 +95,90 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
 
     @Override
     public void rechercher(String texte) {
-        this.texteRecherche = (texte == null) ? "" : texte;
+        this.texteRecherche = texte == null ? "" : texte;
         recalculer();
     }
 
     private void recalculer() {
         List<Propriete> filtres = new ArrayList<>();
-        for (Propriete p : donnees) {
-            if (passeLesFiltres(p) && passeLaRecherche(p)) {
-                filtres.add(p);
+
+        for (Propriete propriete : donnees) {
+            if (passeLesFiltres(propriete)
+                    && passeLaRecherche(propriete)) {
+                filtres.add(propriete);
             }
         }
-        this.resultats = filtres;
-        this.page = 0;
+
+        resultats = filtres;
+        page = 0;
     }
 
-    private boolean passeLesFiltres(Propriete p) {
+    private boolean passeLesFiltres(Propriete propriete) {
         if (criteres.getTransaction() != null
-                && p.getTypeTransaction() != criteres.getTransaction()) {
+                && propriete.getTypeTransaction()
+                != criteres.getTransaction()) {
             return false;
         }
+
         if (criteres.getTypeBien() != null
-                && !p.typeBien().equals(criteres.getTypeBien())) {
+                && !propriete.typeBien().equals(criteres.getTypeBien())) {
             return false;
         }
-        if (criteres.getPrixMax() != null && p.getPrix() > criteres.getPrixMax()) {
+
+        if (criteres.getPrixMax() != null
+                && propriete.getPrix() > criteres.getPrixMax()) {
             return false;
         }
-        if (criteres.getChambresMin() != null && p.getChambres() < criteres.getChambresMin()) {
+
+        if (criteres.getChambresMin() != null
+                && propriete.getChambres() < criteres.getChambresMin()) {
             return false;
         }
-        if (criteres.getVille() != null && !p.getVille().equals(criteres.getVille())) {
-            return false;
-        }
-        return true;
+
+        return criteres.getVille() == null
+                || propriete.getVille().equals(criteres.getVille());
     }
 
-    private boolean passeLaRecherche(Propriete p) {
+    private boolean passeLaRecherche(Propriete propriete) {
         if (texteRecherche.isBlank()) {
             return true;
         }
-        String cible = normaliser(p.getQuartier() + " " + p.getVille());
+
+        String cible = normaliser(
+                propriete.getQuartier() + " " + propriete.getVille()
+        );
+
         return cible.contains(normaliser(texteRecherche));
     }
 
     private static String normaliser(String texte) {
-        String sansAccent = Normalizer.normalize(texte, Normalizer.Form.NFD)
+        String sansAccent = Normalizer.normalize(
+                        texte,
+                        Normalizer.Form.NFD
+                )
                 .replaceAll("\\p{M}", "");
+
         return sansAccent.toLowerCase();
     }
 
-
     @Override
-    public void trier(Comparator<Propriete> comparateur, Algorithme<Propriete> algorithme) {
+    public void trier(
+            Comparator<Propriete> comparateur,
+            Algorithme<Propriete> algorithme
+    ) {
         algorithme.trier(resultats, comparateur);
-        this.page = 0;
+        page = 0;
     }
-
-    // Pagination
 
     @Override
     public List<Propriete> pageCourante() {
         int debut = page * taillePage;
         int fin = Math.min(debut + taillePage, resultats.size());
+
         if (debut >= resultats.size()) {
             return new ArrayList<>();
         }
+
         return new ArrayList<>(resultats.subList(debut, fin));
     }
 
@@ -164,6 +192,7 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
         if (resultats.isEmpty()) {
             return 1;
         }
+
         return (resultats.size() + taillePage - 1) / taillePage;
     }
 
@@ -183,8 +212,14 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
 
     @Override
     public void taillePage(int taille) {
-        this.taillePage = taille;
-        this.page = 0;
+        if (taille <= 0) {
+            throw new IllegalArgumentException(
+                    "La taille de page doit être supérieure à zéro."
+            );
+        }
+
+        taillePage = taille;
+        page = 0;
     }
 
     @Override
