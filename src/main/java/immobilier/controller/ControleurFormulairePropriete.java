@@ -133,9 +133,8 @@ public class ControleurFormulairePropriete {
                 );
             }
 
-            // Identifiant provisoire, à adapter au DAO lors de l'intégration.
             String id = proprieteInitiale == null
-                    ? UUID.randomUUID().toString()
+                    ? creerIdentifiant()
                     : proprieteInitiale.getId();
 
             TypeTransaction transaction = comboTransaction.getValue();
@@ -283,6 +282,14 @@ public class ControleurFormulairePropriete {
 
     public Optional<Propriete> getResultat() {
         return Optional.ofNullable(resultat);
+    }
+
+    private String creerIdentifiant() {
+        return "P" + UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 9)
+                .toUpperCase();
     }
 
     private void fermer() {

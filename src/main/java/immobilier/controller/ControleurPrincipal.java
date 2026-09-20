@@ -96,15 +96,7 @@ public class ControleurPrincipal {
                 "Toutes", "1+", "2+", "3+", "4+", "5+"
         );
 
-        comboVille.getItems().add("Toutes");
-
-        for (Propriete propriete : service.toutesLesDonnees()) {
-            String ville = propriete.getVille();
-
-            if (!comboVille.getItems().contains(ville)) {
-                comboVille.getItems().add(ville);
-            }
-        }
+        actualiserVilles();
 
         comboTransaction.setValue("Toutes");
         comboType.setValue("Toutes");
@@ -394,16 +386,71 @@ public class ControleurPrincipal {
     }
 
     private void preparerFormulaire() {
-        btnAjouter.setOnAction(event -> ouvrirFormulaire(null));
+        btnAjouter.setOnAction(event -> ajouterPropriete());
 
         btnModifier.setOnAction(event -> {
             Propriete selection =
                     tableProprietes.getSelectionModel().getSelectedItem();
 
             if (selection != null) {
-                ouvrirFormulaire(selection);
+                modifierPropriete(selection);
             }
         });
+    }
+
+    private void ajouterPropriete() {
+        Optional<Propriete> resultat = ouvrirFormulaire(null);
+
+        if (resultat.isEmpty()) {
+            return;
+        }
+
+        try {
+            service.ajouter(resultat.get());
+            actualiserVilles();
+            afficherPage();
+            afficherInformation(
+                    "Ajout réussi",
+                    "La propriété a été ajoutée à la base de données."
+            );
+        } catch (RuntimeException e) {
+            afficherErreur(
+                    "Impossible d’ajouter la propriété",
+                    obtenirMessageErreur(e)
+            );
+        }
+    }
+
+    private void modifierPropriete(Propriete propriete) {
+        Optional<Propriete> resultat = ouvrirFormulaire(propriete);
+
+        if (resultat.isEmpty()) {
+            return;
+        }
+
+        try {
+            boolean modifiee = service.modifier(resultat.get());
+
+            if (!modifiee) {
+                afficherErreur(
+                        "Modification impossible",
+                        "La propriété n’existe plus dans la base de données."
+                );
+                return;
+            }
+
+            actualiserVilles();
+            afficherPage();
+            afficherInformation(
+                    "Modification réussie",
+                    "La propriété a été modifiée dans la base de données."
+            );
+        } catch (RuntimeException e) {
+            afficherErreur(
+                    "Impossible de modifier la propriété",
+                    obtenirMessageErreur(e)
+            );
+        }
     }
 
     private Optional<Propriete> ouvrirFormulaire(
@@ -519,23 +566,30 @@ public class ControleurPrincipal {
             return;
         }
 
-        Alert information =
-                new Alert(Alert.AlertType.INFORMATION);
+        try {
+            boolean supprimee = service.supprimer(selection.getId());
 
-        information.initOwner(
-                tableProprietes.getScene().getWindow()
-        );
+            if (!supprimee) {
+                afficherErreur(
+                        "Suppression impossible",
+                        "La propriété n’existe plus dans la base de données."
+                );
+                return;
+            }
 
-        information.setTitle("Suppression");
-        information.setHeaderText(
-                "Aucune propriété supprimée"
-        );
-
-        information.setContentText(
-                "La suppression n’est pas encore disponible."
-        );
-
-        information.showAndWait();
+            favoris.retirer(selection);
+            actualiserVilles();
+            afficherPage();
+            afficherInformation(
+                    "Suppression réussie",
+                    "La propriété a été supprimée de la base de données."
+            );
+        } catch (RuntimeException e) {
+            afficherErreur(
+                    "Impossible de supprimer la propriété",
+                    obtenirMessageErreur(e)
+            );
+        }
     }
 
     @FXML
@@ -582,5 +636,53 @@ public class ControleurPrincipal {
         alerte.setHeaderText(titre);
         alerte.setContentText(message);
         alerte.showAndWait();
+    }
+
+    private void afficherInformation(String titre, String message) {
+        Alert alerte = new Alert(Alert.AlertType.INFORMATION);
+
+        alerte.initOwner(
+                tableProprietes.getScene().getWindow()
+        );
+
+        alerte.setTitle("Catalogue immobilier");
+        alerte.setHeaderText(titre);
+        alerte.setContentText(message);
+        alerte.showAndWait();
+    }
+
+    private void actualiserVilles() {
+        String selection = comboVille.getValue();
+
+        comboVille.getItems().clear();
+        comboVille.getItems().add("Toutes");
+
+        for (Propriete propriete : service.toutesLesDonnees()) {
+            String ville = propriete.getVille();
+
+            if (!comboVille.getItems().contains(ville)) {
+                comboVille.getItems().add(ville);
+            }
+        }
+
+        if (selection != null && comboVille.getItems().contains(selection)) {
+            comboVille.setValue(selection);
+        } else {
+            comboVille.setValue("Toutes");
+        }
+    }
+
+    private String obtenirMessageErreur(Throwable erreur) {
+        Throwable cause = erreur;
+
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+
+        if (cause.getMessage() == null || cause.getMessage().isBlank()) {
+            return "Une erreur inattendue s’est produite.";
+        }
+
+        return cause.getMessage();
     }
 }
