@@ -1,8 +1,8 @@
 package immobilier.service;
 
 import immobilier.algorithmes.Algorithme;
+import immobilier.dao.ProprieteDao;
 import immobilier.model.Propriete;
-import immobilier.util.SourceDonnees;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -13,19 +13,69 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
 
     private static final int TAILLE_PAGE_DEFAUT = 25;
 
-    private final List<Propriete> donnees;
+    private final ProprieteDao dao;
+    private List<Propriete> donnees;
     private List<Propriete> resultats;
     private CritereFiltre criteres = new CritereFiltre();
     private String texteRecherche = "";
     private int taillePage = TAILLE_PAGE_DEFAUT;
     private int page = 0;
 
-    public ServiceCatalogueImpl(SourceDonnees source) {
-        this.donnees = source.charger();
+    public ServiceCatalogueImpl(ProprieteDao dao) {
+        this.dao = dao;
+        try {
+            this.donnees = dao.trouverTous();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur chargement initial", e);
+        }
         this.resultats = new ArrayList<>(donnees);
     }
 
-    // --------- filtres et recherche -------
+    // CRUD
+
+    @Override
+    public void ajouter(Propriete propriete) {
+        try {
+            dao.ajouter(propriete);
+            recharger();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur ajout", e);
+        }
+    }
+
+    @Override
+    public boolean modifier(Propriete propriete) {
+        try {
+            boolean ok = dao.modifier(propriete);
+            recharger();
+            return ok;
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur modification", e);
+        }
+    }
+
+    @Override
+    public boolean supprimer(String id) {
+        try {
+            boolean ok = dao.supprimer(id);
+            recharger();
+            return ok;
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur suppression", e);
+        }
+    }
+
+
+    private void recharger() {
+        try {
+            this.donnees = dao.trouverTous();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur rechargement", e);
+        }
+        recalculer();
+    }
+
+    // Filtres et recherche
 
     @Override
     public void appliquerFiltres(CritereFiltre criteres) {
@@ -79,22 +129,20 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
         return cible.contains(normaliser(texteRecherche));
     }
 
-    /** Minuscules + suppression des accents : "Sainte-Catherine" trouve "sainte-catherine". */
     private static String normaliser(String texte) {
         String sansAccent = Normalizer.normalize(texte, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "");
         return sansAccent.toLowerCase();
     }
 
-    // ------- trier --------
 
     @Override
     public void trier(Comparator<Propriete> comparateur, Algorithme<Propriete> algorithme) {
-        algorithme.trier(resultats, comparateur);   // NOS algorithmes, jamais Collections.sort
+        algorithme.trier(resultats, comparateur);
         this.page = 0;
     }
 
-    // ------ pagination ---------
+    // Pagination
 
     @Override
     public List<Propriete> pageCourante() {
@@ -138,8 +186,6 @@ public class ServiceCatalogueImpl implements ServiceCatalogue {
         this.taillePage = taille;
         this.page = 0;
     }
-
-
 
     @Override
     public int nombreResultats() {

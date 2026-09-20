@@ -124,7 +124,7 @@ public class ProprieteDaoPostgreSQL implements ProprieteDao, SourceDonnees {
             assurerQuartier(conn, propriete.getQuartier(), propriete.getVille());
             try (PreparedStatement ps = conn.prepareStatement(SQL_MODIFIER)) {
                 int dernier = remplirParametresCommuns(ps, propriete, 1);
-                ps.setString(dernier, propriete.getId()); // WHERE id = ?
+                ps.setString(dernier, propriete.getId());
                 return ps.executeUpdate() > 0;
             }
         }
