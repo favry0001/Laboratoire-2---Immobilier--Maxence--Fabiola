@@ -8,7 +8,7 @@ import immobilier.model.TypeTransaction;
 import immobilier.service.CritereFiltre;
 import immobilier.service.ServiceCatalogue;
 import immobilier.service.ServiceCatalogueImpl;
-import immobilier.util.LecteurCSV;
+import immobilier.dao.ProprieteDaoPostgreSQL;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -57,7 +57,7 @@ public class ControleurPrincipal {
     @FXML private Label labelInfos;
 
     private final ServiceCatalogue service =
-            new ServiceCatalogueImpl(new LecteurCSV());
+            new ServiceCatalogueImpl(new ProprieteDaoPostgreSQL());
 
     private final Favoris favoris = new Favoris();
 

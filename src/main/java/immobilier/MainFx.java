@@ -1,6 +1,6 @@
 package immobilier;
 
-import immobilier.util.LecteurCSV;
+import immobilier.dao.ProprieteDaoPostgreSQL;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,7 +15,7 @@ public class MainFx extends Application {
 
         System.out.println(
                 "Nombre de propriétés chargées : "
-                        + new LecteurCSV().charger().size()
+                        + new ProprieteDaoPostgreSQL().charger().size()
         );
 
         FXMLLoader loader = new FXMLLoader(
