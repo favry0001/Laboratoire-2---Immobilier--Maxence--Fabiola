@@ -5,10 +5,10 @@ import immobilier.algorithmes.Comparateurs;
 import immobilier.algorithmes.TriBulle;
 import immobilier.algorithmes.TriFusion;
 import immobilier.algorithmes.TriInsertion;
+import immobilier.dao.ProprieteDaoPostgreSQL;
 import immobilier.model.Propriete;
 import immobilier.service.ServiceCatalogue;
 import immobilier.service.ServiceCatalogueImpl;
-import immobilier.util.LecteurCSV;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -41,23 +41,27 @@ public class ControleurBenchmark {
     private Button btnFermer;
 
     private final ServiceCatalogue service =
-            new ServiceCatalogueImpl(new LecteurCSV());
+            new ServiceCatalogueImpl(
+                    new ProprieteDaoPostgreSQL()
+            );
 
     private final Benchmark<Propriete> benchmark =
             new Benchmark<>();
 
     @FXML
     public void initialize() {
-
         preparerTableau();
 
-        btnLancer.setOnAction(event -> lancerBenchmark());
+        btnLancer.setOnAction(
+                event -> lancerBenchmark()
+        );
 
-        btnFermer.setOnAction(event -> fermerFenetre());
+        btnFermer.setOnAction(
+                event -> fermerFenetre()
+        );
     }
 
     private void preparerTableau() {
-
         colAlgorithme.setCellValueFactory(data ->
                 new SimpleStringProperty(
                         data.getValue().algorithme()
@@ -80,7 +84,6 @@ public class ControleurBenchmark {
     }
 
     private void lancerBenchmark() {
-
         List<Propriete> donnees =
                 service.toutesLesDonnees();
 
@@ -148,7 +151,6 @@ public class ControleurBenchmark {
     }
 
     private void fermerFenetre() {
-
         Stage stage =
                 (Stage) btnFermer
                         .getScene()
