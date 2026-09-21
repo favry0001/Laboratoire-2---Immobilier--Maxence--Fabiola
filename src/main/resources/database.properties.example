@@ -1,3 +1,3 @@
 db.url=jdbc:postgresql://localhost:5432/immobilier
-db.utilisateur=postgres
-db.motdepasse=votre_mot_de_passe
+db.utilisateur=votre_utilisateur
+db.motdepasse=

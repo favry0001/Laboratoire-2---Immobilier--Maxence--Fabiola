@@ -12,6 +12,10 @@
 | Maxence Zeka | zkmance@gmail.com | Interface JavaFX, FXML, CSS, contrôleurs, formulaires et intégration du CRUD |
 | Fabiola Sainvry | favry0001@gmail.com | Modèles, services, DAO PostgreSQL, scripts SQL et intégration JDBC |
 
+## Présentation orale
+
+**Journée choisie :** mercredi 23 septembre 2026
+
 ## Sujet choisi
 
 **Numéro du sujet :** 5  
@@ -19,7 +23,7 @@
 
 ## Dépôt GitHub public
 
-https://github.com/favry0001/Laboratoire-2---Immobilier--Maxence--Fabiola
+https://github.com/favry0001/Laboratoire-2---Immobilier--Maxence--Fabiola.git
 
 ## Fonctionnalités
 

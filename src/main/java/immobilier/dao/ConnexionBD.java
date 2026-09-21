@@ -1,5 +1,4 @@
 package immobilier.dao;
-
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,7 +27,6 @@ public class ConnexionBD {
     }
 
     private ConnexionBD() { }
-
     public static Connection getConnexion() throws SQLException {
         return DriverManager.getConnection(URL, UTILISATEUR, MOT_DE_PASSE);
     }
