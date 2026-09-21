@@ -1,5 +1,5 @@
 -- Schéma relationnel
--- =================================================
+-- ================================================
 
 DROP TABLE IF EXISTS propriete CASCADE;
 DROP TABLE IF EXISTS quartier  CASCADE;
