@@ -5,3 +5,4 @@ out/
 *.class
 outils/generer_sql.py
 src/main/resources/database.properties
+

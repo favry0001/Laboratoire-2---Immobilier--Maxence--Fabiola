@@ -1,6 +1,6 @@
 
 -- Données  proprietes.csv
--- =======================
+-- ======================
 
 -- Quartiers
 INSERT INTO quartier (id, nom, ville) VALUES (1, 'Villeray - Boulevard Saint-Laurent', 'Montreal');
