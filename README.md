@@ -7,9 +7,9 @@
 
 ## Équipe
 
-| Nom complet | Adresse courriel | Contribution principale |
-|---|---|---|
-| Maxence Zeka | zkmance@gmail.com | Interface JavaFX, FXML, CSS, contrôleurs, formulaires et intégration du CRUD |
+| Nom complet | Adresse courriel    | Contribution principale |
+|---|---------------------|---|
+| Maxence Zeka | zkmaxance@gmail.com | Interface JavaFX, FXML, CSS, contrôleurs, formulaires et intégration du CRUD |
 | Fabiola Sainvry | favry0001@gmail.com | Modèles, services, DAO PostgreSQL, scripts SQL et intégration JDBC |
 
 ## Présentation orale

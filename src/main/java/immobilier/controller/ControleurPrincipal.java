@@ -85,23 +85,23 @@ public class ControleurPrincipal {
         );
 
         comboTransaction.getItems().addAll(
-                "Toutes", "Vente", "Location"
+                "Transactions", "Vente", "Location"
         );
 
         comboType.getItems().addAll(
-                "Toutes", "Maison", "Condo"
+                "Type", "Maison", "Condo"
         );
 
         comboChambres.getItems().addAll(
-                "Toutes", "1+", "2+", "3+", "4+", "5+"
+                "Nbr chambres", "1+", "2+", "3+", "4+", "5+"
         );
 
         actualiserVilles();
 
-        comboTransaction.setValue("Toutes");
-        comboType.setValue("Toutes");
-        comboChambres.setValue("Toutes");
-        comboVille.setValue("Toutes");
+        comboTransaction.setValue("Transactions");
+        comboType.setValue("Type");
+        comboChambres.setValue("Nbr chambres");
+        comboVille.setValue("Villes");
     }
 
     private void preparerTableau() {
@@ -655,7 +655,7 @@ public class ControleurPrincipal {
         String selection = comboVille.getValue();
 
         comboVille.getItems().clear();
-        comboVille.getItems().add("Toutes");
+        comboVille.getItems().add("Villes");
 
         for (Propriete propriete : service.toutesLesDonnees()) {
             String ville = propriete.getVille();
@@ -668,7 +668,7 @@ public class ControleurPrincipal {
         if (selection != null && comboVille.getItems().contains(selection)) {
             comboVille.setValue(selection);
         } else {
-            comboVille.setValue("Toutes");
+            comboVille.setValue("Villes");
         }
     }
 

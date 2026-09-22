@@ -13,7 +13,7 @@
     <Label text="Comparaison des algorithmes de tri"
            style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
 
-    <Label text="Benchmark sur les propriétés chargées depuis le CSV."/>
+    <Label text="Benchmark sur les propriétés chargées depuis le PostgreSQL."/>
 
     <TableView fx:id="tableBenchmark"
                prefHeight="280">
